@@ -1,4 +1,4 @@
-export type DifficultyLevel = 1 | 2 | 3 | 4 | 5;
+export type DifficultyLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export interface DifficultyConfig {
   level: DifficultyLevel;
@@ -22,9 +22,9 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
   },
   2: {
     level: 2,
-    name: "Casual",
-    rating: 800,
-    skillLevel: 5,
+    name: "Easy",
+    rating: 1000,
+    skillLevel: 3,
     depth: 3,
     timeLimit: 300,
     description: "A friendly sparring partner for casual play."
@@ -32,29 +32,47 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
   3: {
     level: 3,
     name: "Intermediate",
-    rating: 1000,
-    skillLevel: 10,
+    rating: 1400,
+    skillLevel: 8,
     depth: 6,
     timeLimit: 600,
-    description: "Plays steady, club-level chess with fewer blunders."
+    description: "Plays steady club-level chess with fewer blunders."
   },
   4: {
     level: 4,
     name: "Advanced",
-    rating: 1400,
-    skillLevel: 15,
+    rating: 1800,
+    skillLevel: 13,
     depth: 10,
     timeLimit: 1200,
     description: "A formidable challenger with positional awareness."
   },
   5: {
     level: 5,
-    name: "Expert",
-    rating: 1800,
+    name: "Strong",
+    rating: 2200,
+    skillLevel: 17,
+    depth: 14,
+    timeLimit: 2000,
+    description: "Near-expert level. Expects tactical accuracy."
+  },
+  6: {
+    level: 6,
+    name: "Master",
+    rating: 2500,
+    skillLevel: 19,
+    depth: 18,
+    timeLimit: 3000,
+    description: "Master-strength play with deep positional understanding."
+  },
+  7: {
+    level: 7,
+    name: "Full Strength",
+    rating: 2800,
     skillLevel: 20,
-    depth: 15,
-    timeLimit: 2500,
-    description: "Strong tactical and positional play. Serious challenge."
+    depth: 24,
+    timeLimit: 5000,
+    description: "Maximum engine power. Virtually unbeatable."
   }
 };
 

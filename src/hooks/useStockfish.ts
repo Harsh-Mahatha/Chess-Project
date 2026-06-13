@@ -3,7 +3,7 @@ import { type DifficultyLevel, type EngineEvaluation, DIFFICULTY_CONFIGS, type E
 
 export function useStockfish() {
   const workerRef = useRef<Worker | null>(null);
-  const [evaluation, setEvaluation] = useState<EngineEvaluation>({ type: 'cp', value: 0.3 }); // Default slight white advantage
+  const [evaluation, setEvaluation] = useState<EngineEvaluation>({ type: 'cp', value: 0 });
   const [bestMove, setBestMove] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [engineStatus, setEngineStatus] = useState<EngineStatus>('idle');
@@ -64,6 +64,14 @@ export function useStockfish() {
       setIsThinking(false);
     }
   }, [isThinking]);
+
+  // Reset evaluation state to starting position (used by handleReset)
+  const resetEvaluation = useCallback(() => {
+    setEvaluation({ type: 'cp', value: 0 });
+    setBestMove(null);
+    setEngineDepth(0);
+    setIsThinking(false);
+  }, []);
 
   // Start search for a FEN position
   const getEngineMove = useCallback((fen: string, difficulty: DifficultyLevel, onMoveCallback?: (move: string) => void) => {
@@ -150,7 +158,7 @@ export function useStockfish() {
 
   }, [initWorker, stopSearch]);
 
-  // Perform deeper analysis for the "Analyze" button
+  // Perform deeper analysis for the "Hint" button
   const analyzePosition = useCallback((fen: string) => {
     const worker = initWorker();
     if (!worker) return;
@@ -199,7 +207,7 @@ export function useStockfish() {
       }
     };
 
-    // Perform analysis up to depth 15 (grandmaster level)
+    // Perform analysis up to depth 15
     worker.postMessage('go depth 15');
     
     // Auto-stop after 3 seconds if not completed
@@ -225,6 +233,7 @@ export function useStockfish() {
     getEngineMove,
     analyzePosition,
     stopSearch,
+    resetEvaluation,
     terminateWorker
   };
 }

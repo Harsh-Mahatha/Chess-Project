@@ -9,7 +9,6 @@
 // ── GSAP: register plugins immediately (before any component renders) ──────
 import './utils/gsapConfig';
 
-import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import ProductDemo from './components/ProductDemo';
@@ -24,9 +23,6 @@ function App() {
        ScrollTrigger uses #smooth-content as the scroller when Club is enabled. */
     <div id="smooth-wrapper">
       <div id="smooth-content">
-
-        {/* Navigation — sits above the scroll layer */}
-        <Navbar />
 
         {/* Landing Page Content */}
         <div className="min-h-screen bg-brand-bg text-brand-text flex flex-col selection:bg-brand-accent selection:text-white">

@@ -3,12 +3,13 @@
  * Landing hero section with premium GSAP animations:
  *
  * Animations:
- *   ① Headline lines — staggered fade-up (y:40→0, opacity:0→1, 0.8s each, 0.15s stagger)
- *   ② Subtitle + CTA buttons — fade-up after headline (back.out spring)
- *   ③ Chessboard container — slide from right (x:80→0) + fade, 1.2s, slight rotation correction
- *   ④ Chessboard float — mobile only: infinite y:-8px yoyo (handled by usePerspectiveTilt)
- *   ⑤ Background orbs — CSS keyframe float (no GSAP, pure composited GPU layer)
- *   ⑥ Perspective tilt — desktop: cursor-driven 3D tilt via usePerspectiveTilt hook
+ *   ① Logo — fade-down entrance
+ *   ② Headline lines — staggered fade-up (y:40→0, opacity:0→1, 0.8s each, 0.15s stagger)
+ *   ③ Subtitle + CTA buttons — fade-up after headline (back.out spring)
+ *   ④ Chessboard container — slide from right (x:80→0) + fade, 1.2s, slight rotation correction
+ *   ⑤ Chessboard float — mobile only: infinite y:-8px yoyo (handled by usePerspectiveTilt)
+ *   ⑥ Background orbs — CSS keyframe float (no GSAP, pure composited GPU layer)
+ *   ⑦ Perspective tilt — desktop: cursor-driven 3D tilt via usePerspectiveTilt hook
  */
 
 import { useState, useRef } from 'react';
@@ -19,6 +20,10 @@ import { useGSAP } from '../hooks/useGSAP';
 import { usePerspectiveTilt } from '../hooks/usePerspectiveTilt';
 import { useButtonGlow } from '../hooks/useButtonGlow';
 import { gsap, dur, ease } from '../utils/gsapConfig';
+
+// ── Board colours (same as ProductDemo) ────────────────────────────────────
+const BOARD_DARK  = '#769656';   // Tournament green
+const BOARD_LIGHT = '#EEEED2';   // Off-white / cream
 
 export default function Hero() {
   // ── Chess logic (unchanged) ──────────────────────────────────────────────
@@ -53,6 +58,7 @@ export default function Hero() {
 
   // ── Animation refs ────────────────────────────────────────────────────────
   const heroRef     = useRef<HTMLElement>(null);
+  const logoRef     = useRef<HTMLImageElement>(null);
   const line1Ref    = useRef<HTMLSpanElement>(null);
   const line2Ref    = useRef<HTMLSpanElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -60,8 +66,6 @@ export default function Hero() {
   const boardColRef = useRef<HTMLDivElement>(null);
 
   // ── Perspective tilt hook (manages its own ref) ────────────────────────────
-  // Desktop: cursor-driven 3D tilt + shadow
-  // Mobile:  gentle translateY float (replaces old unconditional float)
   const tiltRef = usePerspectiveTilt<HTMLDivElement>({
     maxRotate:       8,
     scalePeak:       1.02,
@@ -72,7 +76,6 @@ export default function Hero() {
   });
 
   const primaryGlowRef = useButtonGlow<HTMLAnchorElement>();
-  const secondaryGlowRef = useButtonGlow<HTMLAnchorElement>();
 
   // ── GSAP entrance animations ───────────────────────────────────────────────
   useGSAP(
@@ -81,14 +84,22 @@ export default function Hero() {
 
       const tl = gsap.timeline({ defaults: { ease: ease.out } });
 
-      // ① Headline lines — staggered fade-up
+      // ① Logo — fade down
+      tl.fromTo(
+        logoRef.current,
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: dur(0.6) }
+      );
+
+      // ② Headline lines — staggered fade-up
       tl.fromTo(
         [line1Ref.current, line2Ref.current],
         { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: dur(0.8), stagger: 0.15 }
+        { opacity: 1, y: 0, duration: dur(0.8), stagger: 0.15 },
+        '-=0.2'
       );
 
-      // ② Subtitle → fade up, then CTA buttons spring in
+      // ③ Subtitle → fade up, then CTA buttons spring in
       tl.fromTo(
         subtitleRef.current,
         { opacity: 0, y: 30 },
@@ -103,7 +114,7 @@ export default function Hero() {
         '-=0.3'
       );
 
-      // ③ Chessboard column — slide from right + rotation correction
+      // ④ Chessboard column — slide from right + rotation correction
       tl.fromTo(
         boardColRef.current,
         { opacity: 0, x: 80, rotation: -3 },
@@ -144,7 +155,7 @@ export default function Hero() {
   return (
     <header
       ref={heroRef}
-      className="relative pt-24 pb-16 md:pt-36 md:pb-28 overflow-hidden bg-brand-bg"
+      className="relative pt-16 pb-16 md:pt-24 md:pb-28 overflow-hidden bg-brand-bg"
     >
       {/* ── Background glow orbs (CSS animated — GPU composited) ─────────── */}
       <div
@@ -161,6 +172,19 @@ export default function Hero() {
 
           {/* ── Text Column ────────────────────────────────────────────────── */}
           <div className="lg:col-span-6 space-y-6 md:space-y-8 text-left">
+
+            {/* Logo above heading */}
+            <div>
+              <img
+                ref={logoRef}
+                src="/logo.png"
+                alt="XLChess logo"
+                className="h-14 sm:h-16 w-auto object-contain"
+                style={{ opacity: 0 }}
+                draggable={false}
+              />
+            </div>
+
             <h1 className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.1] md:leading-[1.05]">
               {/* Each span is a separate animation target */}
               <span ref={line1Ref} className="block" style={{ opacity: 0 }}>
@@ -183,13 +207,12 @@ export default function Hero() {
               A creator-owned chess platform where you own the brand, community, and upside.
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA — Play Demo only */}
             <div
               ref={ctaRef}
               className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
               style={{ opacity: 0 }}
             >
-              {/* Primary CTA — interactive glow via useButtonGlow */}
               <a
                 ref={primaryGlowRef}
                 href="#interactive-demo"
@@ -207,26 +230,6 @@ export default function Hero() {
               >
                 Play Demo
                 <ArrowRight className="w-4 h-4" />
-              </a>
-
-              {/* Secondary CTA */}
-              <a
-                ref={secondaryGlowRef}
-                href="#partner-cta"
-                id="hero-cta-secondary"
-                className="
-                  inline-flex items-center justify-center gap-2
-                  font-sans font-semibold text-sm
-                  bg-brand-surface hover:bg-brand-surface/80
-                  border border-brand-border text-brand-secondary hover:text-white
-                  px-6 py-3.5 rounded-lg
-                  transition-all duration-200
-                  hover:scale-[1.05] active:scale-[0.97]
-                  hover:border-brand-accent/30
-                  btn-glow-container btn-glow-surface
-                "
-              >
-                Become a Partner
               </a>
             </div>
           </div>
@@ -270,12 +273,13 @@ export default function Hero() {
                         position: gameFen,
                         onPieceDrop: ({ sourceSquare, targetSquare }) =>
                           onDrop(sourceSquare, targetSquare),
-                        darkSquareStyle:  { backgroundColor: '#b58863' },
-                        lightSquareStyle: { backgroundColor: '#f0d9b5' },
+                        darkSquareStyle:  { backgroundColor: BOARD_DARK },
+                        lightSquareStyle: { backgroundColor: BOARD_LIGHT },
                         boardStyle: {
                           borderRadius: '4px',
                           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
                         },
+                        showNotation: false,
                       }}
                     />
                   </div>
