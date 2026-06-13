@@ -5,45 +5,24 @@
  *   - Scroll-direction hide/show (via useNavbarAnimation)
  *   - CSS underline-grow effect on nav links (.nav-link class)
  *   - CTA button scale + glow via CSS hover utilities
+ *   - Logo: full GSAP interpolate() + quickTo() cursor-driven animation
+ *     (via useLogoAnimation hook — see hooks/useLogoAnimation.ts)
  */
 
 import { useState, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useNavbarAnimation } from '../hooks/useNavbarAnimation';
-import { gsap } from '../utils/gsapConfig';
+import { useLogoAnimation } from '../hooks/useLogoAnimation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const navRef   = useRef<HTMLElement>(null);
-  const logoRef  = useRef<HTMLImageElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
-  // Attach entrance + hide/show scroll animation
+  // Navbar entrance + hide/show on scroll
   useNavbarAnimation(navRef as React.RefObject<HTMLElement | null>);
 
-  // ── Logo hover handlers ──────────────────────────────────────────────────
-  function onLogoEnter() {
-    if (!logoRef.current) return;
-    gsap.to(logoRef.current, {
-      scale: 1.08,
-      y: -2,
-      filter: 'drop-shadow(0 0 10px rgba(99,102,241,0.55)) drop-shadow(0 4px 12px rgba(99,102,241,0.30))',
-      duration: 0.35,
-      ease: 'back.out(2)',
-      overwrite: 'auto',
-    });
-  }
-
-  function onLogoLeave() {
-    if (!logoRef.current) return;
-    gsap.to(logoRef.current, {
-      scale: 1,
-      y: 0,
-      filter: 'drop-shadow(0 0 0px rgba(99,102,241,0))',
-      duration: 0.4,
-      ease: 'power2.out',
-      overwrite: 'auto',
-    });
-  }
+  // Full premium logo animation (interpolate + quickTo + float + dance)
+  const { containerRef, logoRef } = useLogoAnimation();
 
   const navLinks = [
     { name: 'Why ChessCraft', href: '#why-ownership' },
@@ -57,24 +36,39 @@ export default function Navbar() {
       ref={navRef}
       id="main-navbar"
       className="fixed top-0 left-0 right-0 z-50 bg-brand-bg/85 backdrop-blur-md border-b border-brand-border"
-      /* Start invisible — GSAP animates in */
       style={{ opacity: 0 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
 
-          {/* Logo — GSAP hover: scale + glow spring */}
-          <div className="flex items-center gap-2">
+          {/*
+            ── Logo ───────────────────────────────────────────────────────────
+            containerRef  → mouse-event target (receives mousemove/enter/leave)
+            logoRef       → visual transform target (rotateX/Y, scale, float)
+
+            perspective on the container ensures child 3D rotations render correctly.
+            transformStyle: preserve-3d propagates depth to the img.
+          */}
+          <div
+            ref={containerRef}
+            className="flex items-center gap-2 cursor-pointer select-none"
+            style={{ perspective: '600px' }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            role="link"
+            aria-label="XLChess — scroll to top"
+          >
             <img
               ref={logoRef}
               src="/logo.png"
               alt="XLChess logo"
               id="navbar-logo"
-              className="h-10 sm:h-12 w-auto object-contain cursor-pointer select-none"
-              style={{ willChange: 'transform, filter', transformOrigin: 'center center' }}
-              onMouseEnter={onLogoEnter}
-              onMouseLeave={onLogoLeave}
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="h-10 sm:h-12 w-auto object-contain"
+              style={{
+                willChange: 'transform, filter',
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'center center',
+              }}
+              draggable={false}
             />
           </div>
 
@@ -99,7 +93,7 @@ export default function Navbar() {
             >
               View Live Demo
             </a>
-            {/* Primary CTA — scale + glow on hover via Tailwind group + CSS */}
+            {/* Primary CTA — scale + glow on hover via Tailwind */}
             <a
               href="#partner-cta"
               id="navbar-cta-btn"
