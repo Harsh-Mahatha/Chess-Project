@@ -320,27 +320,31 @@ html::-webkit-scrollbar-corner,
 
 .hero-particle {
   position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.7), transparent 70%);
+  font-family: serif;
+  color: rgba(99, 102, 241, 0.35);
+  text-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
+  user-select: none;
+  pointer-events: none;
   animation: particle-float linear infinite;
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 /* Individual particle sizes and positions */
-.hero-particle-1 { width: 4px;  height: 4px;  left: 10%;  top: 80%; animation-duration: 8s;  animation-delay: 0s;    }
-.hero-particle-2 { width: 3px;  height: 3px;  left: 25%;  top: 90%; animation-duration: 10s; animation-delay: 1.2s;  }
-.hero-particle-3 { width: 5px;  height: 5px;  left: 40%;  top: 85%; animation-duration: 7s;  animation-delay: 0.5s;  }
-.hero-particle-4 { width: 3px;  height: 3px;  left: 60%;  top: 92%; animation-duration: 12s; animation-delay: 2s;    }
-.hero-particle-5 { width: 4px;  height: 4px;  left: 75%;  top: 88%; animation-duration: 9s;  animation-delay: 0.8s;  }
-.hero-particle-6 { width: 2px;  height: 2px;  left: 88%;  top: 78%; animation-duration: 11s; animation-delay: 3s;    }
-.hero-particle-7 { width: 3px;  height: 3px;  left: 50%;  top: 95%; animation-duration: 8.5s;animation-delay: 1.7s;  }
-.hero-particle-8 { width: 4px;  height: 4px;  left: 15%;  top: 70%; animation-duration: 13s; animation-delay: 0.3s;  }
+.hero-particle-1 { font-size: 16px;  left: 10%;  top: 80%; animation-duration: 8s;  animation-delay: 0s;    }
+.hero-particle-2 { font-size: 12px;  left: 25%;  top: 90%; animation-duration: 10s; animation-delay: 1.2s;  }
+.hero-particle-3 { font-size: 20px;  left: 40%;  top: 85%; animation-duration: 7s;  animation-delay: 0.5s;  }
+.hero-particle-4 { font-size: 11px;  left: 60%;  top: 92%; animation-duration: 12s; animation-delay: 2s;    }
+.hero-particle-5 { font-size: 15px;  left: 75%;  top: 88%; animation-duration: 9s;  animation-delay: 0.8s;  }
+.hero-particle-6 { font-size: 10px;  left: 88%;  top: 78%; animation-duration: 11s; animation-delay: 3s;    }
+.hero-particle-7 { font-size: 13px;  left: 50%;  top: 95%; animation-duration: 8.5s;animation-delay: 1.7s;  }
+.hero-particle-8 { font-size: 18px;  left: 15%;  top: 70%; animation-duration: 13s; animation-delay: 0.3s;  }
 
 @keyframes particle-float {
-  0%   { transform: translateY(0)   translateX(0);   opacity: 0;    }
-  10%  { opacity: 0.8; }
-  90%  { opacity: 0.5; }
-  100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
+  0%   { transform: translateY(0)   translateX(0) rotate(0deg);   opacity: 0;    }
+  15%  { opacity: 0.55; }
+  85%  { opacity: 0.45; }
+  100% { transform: translateY(-150px) translateX(25px) rotate(180deg); opacity: 0; }
 }
 
 /* ── Puzzle solved badge entrance animation ──────────────────────────────── */
@@ -436,10 +440,11 @@ html::-webkit-scrollbar-corner,
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(
-    circle 160px at var(--glow-x, 50%) var(--glow-y, 50%),
-    rgba(99, 102, 241, 0.18) 0%,
-    rgba(139, 92, 246, 0.08) 45%,
-    rgba(99, 102, 241, 0)    100%
+    circle 220px at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(99, 102, 241, 0.24) 0%,
+    rgba(139, 92, 246, 0.14) 35%,
+    rgba(99, 102, 241, 0.04) 60%,
+    rgba(0, 0, 0, 0)    100%
   );
   opacity: var(--glow-opacity, 0);
   /* CRITICAL: must never intercept pointer events */
@@ -549,18 +554,25 @@ html::-webkit-scrollbar-corner,
 /* ── Piece lift refinement (upgrade from previous rule) ────────────────────
    Use :where() to lower specificity so the library can still override.      */
 :where([data-testid^="piece-"]) {
-  transition: transform 120ms ease-out, filter 120ms ease-out;
+  --mag-x: 0px;
+  --mag-y: 0px;
+  --lift-y: 0px;
+  --mag-scale: 1;
+  transform: translate(var(--mag-x), calc(var(--mag-y) + var(--lift-y))) scale(var(--mag-scale)) !important;
+  transition: transform 150ms cubic-bezier(0.25, 1, 0.5, 1), filter 150ms ease-out;
   cursor: grab;
   will-change: transform;
 }
 :where([data-testid^="piece-"]):hover {
-  transform: translateY(-4px) scale(1.1) !important;
+  --lift-y: -5px;
+  --mag-scale: 1.1;
   filter: drop-shadow(0 8px 16px rgba(99, 102, 241, 0.5));
   z-index: 100;
 }
 :where([data-testid^="piece-"]):active {
   cursor: grabbing;
-  transform: translateY(-8px) scale(1.15) !important;
+  --lift-y: -9px;
+  --mag-scale: 1.15;
   filter: drop-shadow(0 12px 24px rgba(99, 102, 241, 0.65));
 }
 
@@ -584,5 +596,57 @@ html::-webkit-scrollbar-corner,
   :where([data-testid^="piece-"]):active {
     transform: none !important;
     filter: none !important;
+  }
+}
+
+/* ── CTA shine sweep effect ──────────────────────────────────────────────── */
+.cta-shine {
+  position: relative;
+  overflow: hidden;
+}
+.cta-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 5;
+}
+.cta-shine:hover::before {
+  animation: shine-sweep 0.75s ease-in-out forwards;
+}
+@keyframes shine-sweep {
+  0% { left: -150%; }
+  100% { left: 150%; }
+}
+
+/* ── 3D Showcase animations ──────────────────────────────────────────────── */
+@keyframes showcase-piece-float {
+  0%, 100% {
+    transform: translateZ(20px) rotateX(-55deg) rotateZ(45deg) translateY(-6px);
+    filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.65));
+  }
+  50% {
+    transform: translateZ(28px) rotateX(-55deg) rotateZ(45deg) translateY(-12px);
+    filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.45));
+  }
+}
+@keyframes showcase-piece-float-alt {
+  0%, 100% {
+    transform: translateZ(24px) rotateX(-55deg) rotateZ(45deg) translateY(-12px);
+    filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.5));
+  }
+  50% {
+    transform: translateZ(32px) rotateX(-55deg) rotateZ(45deg) translateY(-6px);
+    filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.6));
   }
 }

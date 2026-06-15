@@ -303,6 +303,10 @@ export default function HeroPuzzle() {
     hasCelebratedRef.current = false;
     clearTrail();
     if (boardCardRef.current) boardCardRef.current.style.boxShadow = '';
+    if (checkmateRef.current) {
+      gsap.killTweensOf(checkmateRef.current);
+      gsap.set(checkmateRef.current, { display: 'none', opacity: 0, scale: 0.6 });
+    }
 
     setTimeout(() => {
       setPhase('solving');
@@ -325,6 +329,10 @@ export default function HeroPuzzle() {
     hasCelebratedRef.current = false;
     clearTrail();
     if (boardCardRef.current) boardCardRef.current.style.boxShadow = '';
+    if (checkmateRef.current) {
+      gsap.killTweensOf(checkmateRef.current);
+      gsap.set(checkmateRef.current, { display: 'none', opacity: 0, scale: 0.6 });
+    }
   }, [clearTrail]);
 
   // Solve animation stepper
@@ -356,6 +364,61 @@ export default function HeroPuzzle() {
     return () => { if (solveTimerRef.current) clearTimeout(solveTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solveStep, phase]);
+
+  // ── Magnetic piece hover effect ────────────────────────────────────────────
+  useEffect(() => {
+    const board = boardInnerRef.current;
+    if (!board || prefersReducedMotion()) return;
+
+    let activePiece: HTMLElement | null = null;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const piece = (e.target as HTMLElement).closest('[data-testid^="piece-"]') as HTMLElement | null;
+      
+      if (piece) {
+        if (activePiece && activePiece !== piece) {
+          activePiece.style.setProperty('--mag-x', '0px');
+          activePiece.style.setProperty('--mag-y', '0px');
+        }
+        activePiece = piece;
+        
+        const rect = piece.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        
+        piece.style.setProperty('--mag-x', `${(dx * 0.25).toFixed(1)}px`);
+        piece.style.setProperty('--mag-y', `${(dy * 0.25).toFixed(1)}px`);
+      } else {
+        if (activePiece) {
+          activePiece.style.setProperty('--mag-x', '0px');
+          activePiece.style.setProperty('--mag-y', '0px');
+          activePiece = null;
+        }
+      }
+    };
+
+    const onMouseLeave = () => {
+      if (activePiece) {
+        activePiece.style.setProperty('--mag-x', '0px');
+        activePiece.style.setProperty('--mag-y', '0px');
+        activePiece = null;
+      }
+    };
+
+    board.addEventListener('mousemove', onMouseMove);
+    board.addEventListener('mouseleave', onMouseLeave);
+
+    return () => {
+      board.removeEventListener('mousemove', onMouseMove);
+      board.removeEventListener('mouseleave', onMouseLeave);
+      if (activePiece) {
+        activePiece.style.setProperty('--mag-x', '0px');
+        activePiece.style.setProperty('--mag-y', '0px');
+      }
+    };
+  }, []);
 
   // ══════════════════════════════════════════════════════════════════════════
   // Square styles
@@ -416,8 +479,10 @@ export default function HeroPuzzle() {
       >
         {/* ── Floating ambient particles (pointer-events:none inherits) ──── */}
         <div className="hero-particles" aria-hidden="true">
-          {[...Array(8)].map((_, i) => (
-            <span key={i} className={`hero-particle hero-particle-${i + 1}`} />
+          {['♞', '♝', '♜', '♟', '♞', '♝', '♜', '♟'].map((symbol, i) => (
+            <span key={i} className={`hero-particle hero-particle-${i + 1}`}>
+              {symbol}
+            </span>
           ))}
         </div>
 
@@ -481,7 +546,7 @@ export default function HeroPuzzle() {
         <div
           ref={boardCardRef}
           className="bg-brand-surface"
-          style={{ willChange: 'transform, opacity, box-shadow', opacity: 0 }}
+          style={{ willChange: 'transform, opacity, box-shadow', opacity: 0, transformStyle: 'preserve-3d' }}
         >
           {/*
             ── Board inner — SVG trail overlay sits here
@@ -490,7 +555,7 @@ export default function HeroPuzzle() {
           <div
             ref={boardInnerRef}
             className="aspect-square rounded-lg overflow-hidden relative"
-            style={{ willChange: 'filter' }}
+            style={{ willChange: 'filter', transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
           >
             {/* ── Move trail SVG overlay (pointer-events:none — never blocks) ── */}
             <svg

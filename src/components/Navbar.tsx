@@ -110,7 +110,7 @@ export default function Navbar() {
                 shadow-lg shadow-brand-accent/20
                 hover:scale-[1.03] hover:shadow-brand-accent/40
                 active:scale-[0.97]
-                btn-glow-container btn-glow-accent
+                btn-glow-container btn-glow-accent cta-shine
               "
             >
               Become a Partner

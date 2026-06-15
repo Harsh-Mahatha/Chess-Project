@@ -19,13 +19,14 @@ import { ArrowRight } from 'lucide-react';
 import { useGSAP } from '../hooks/useGSAP';
 import { usePerspectiveTilt } from '../hooks/usePerspectiveTilt';
 import { useButtonGlow } from '../hooks/useButtonGlow';
+import { useLogoAnimation } from '../hooks/useLogoAnimation';
 import { gsap, dur, ease } from '../utils/gsapConfig';
 import HeroPuzzle from './HeroPuzzle';
 
 export default function Hero() {
   // ── Animation refs ────────────────────────────────────────────────────────
   const heroRef     = useRef<HTMLElement>(null);
-  const logoRef     = useRef<HTMLImageElement>(null);
+  const { containerRef: heroLogoContainerRef, logoRef: heroLogoRef } = useLogoAnimation();
   const line1Ref    = useRef<HTMLSpanElement>(null);
   const line2Ref    = useRef<HTMLSpanElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -34,10 +35,10 @@ export default function Hero() {
 
   // ── Perspective tilt hook (manages its own ref) ────────────────────────────
   const tiltRef = usePerspectiveTilt<HTMLDivElement>({
-    maxRotate:       6,
-    scalePeak:       1.02,
-    quickToDuration: 0.4,
-    quickToEase:     'power3.out',
+    maxRotate:       10,
+    scalePeak:       1.04,
+    quickToDuration: 0.35,
+    quickToEase:     'power2.out',
     floatDistance:   8,
     floatDuration:   3,
   });
@@ -53,7 +54,7 @@ export default function Hero() {
 
       // ① Logo — fade down
       tl.fromTo(
-        logoRef.current,
+        heroLogoContainerRef.current,
         { opacity: 0, y: -20 },
         { opacity: 1, y: 0, duration: dur(0.6) }
       );
@@ -160,13 +161,21 @@ export default function Hero() {
           <div className="lg:col-span-6 space-y-6 md:space-y-8 text-left">
 
             {/* Logo above heading */}
-            <div>
+            <div
+              ref={heroLogoContainerRef}
+              className="flex items-center cursor-pointer select-none"
+              style={{ opacity: 0, perspective: '600px' }}
+            >
               <img
-                ref={logoRef}
+                ref={heroLogoRef}
                 src="/logo.png"
                 alt="XLChess logo"
                 className="h-14 sm:h-16 w-auto object-contain"
-                style={{ opacity: 0 }}
+                style={{
+                  willChange: 'transform, filter',
+                  transformStyle: 'preserve-3d',
+                  transformOrigin: 'center center',
+                }}
                 draggable={false}
               />
             </div>
@@ -211,7 +220,7 @@ export default function Hero() {
                   transition-all duration-200
                   shadow-xl shadow-brand-accent/20
                   hover:scale-[1.05] active:scale-[0.97]
-                  btn-glow-container btn-glow-accent
+                  btn-glow-container btn-glow-accent cta-shine
                 "
               >
                 Play Demo

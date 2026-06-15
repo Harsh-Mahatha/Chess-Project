@@ -1,8 +1,3 @@
-/**
- * Footer.tsx
- * ScrollTrigger animation: fade-up reveal on viewport entry.
- */
-
 import { useRef } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useLogoAnimation } from '../hooks/useLogoAnimation';
