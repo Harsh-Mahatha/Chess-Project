@@ -66,7 +66,7 @@ export default function Navbar() {
               src="/logo.png"
               alt="XLChess logo"
               id="navbar-logo"
-              className="h-10 sm:h-12 w-auto object-contain"
+              className="h-13 sm:h-[62px] w-auto object-contain"
               style={{
                 willChange: 'transform, filter',
                 transformStyle: 'preserve-3d',

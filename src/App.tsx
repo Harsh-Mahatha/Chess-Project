@@ -17,12 +17,20 @@ import BuiltFor from './components/BuiltFor';
 import PartnerCTA from './components/PartnerCTA';
 import Footer from './components/Footer';
 
+import { ParticlesProvider } from '@tsparticles/react';
+import { loadConfettiCannonPreset } from '@tsparticles/preset-confetti-cannon';
+
+const initParticles = async (engine: any) => {
+  await loadConfettiCannonPreset(engine);
+};
+
 function App() {
   return (
-    /* smooth-wrapper + smooth-content: ScrollSmoother-ready DOM structure.
-       ScrollTrigger uses #smooth-content as the scroller when Club is enabled. */
-    <div id="smooth-wrapper">
-      <div id="smooth-content">
+    <ParticlesProvider init={initParticles}>
+      {/* smooth-wrapper + smooth-content: ScrollSmoother-ready DOM structure.
+         ScrollTrigger uses #smooth-content as the scroller when Club is enabled. */}
+      <div id="smooth-wrapper">
+        <div id="smooth-content">
 
         {/* Landing Page Content */}
         <div className="min-h-screen bg-brand-bg text-brand-text flex flex-col selection:bg-brand-accent selection:text-white">
@@ -54,6 +62,7 @@ function App() {
 
       </div>
     </div>
+    </ParticlesProvider>
   );
 }
 

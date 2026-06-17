@@ -1,12 +1,9 @@
 import { useRef } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { useLogoAnimation } from '../hooks/useLogoAnimation';
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
   useScrollReveal(footerRef as React.RefObject<Element | null>, { y: 40, duration: 0.7 });
-
-  const { containerRef, logoRef } = useLogoAnimation();
 
   const handlePlayClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -25,22 +22,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
-          {/* Brand Signature — logo.png from public/ */}
-          <div
-            ref={containerRef}
-            className="flex items-center cursor-pointer select-none"
-            style={{ perspective: '600px' }}
-          >
+          {/* Brand Signature — static logo, no animation */}
+          <div className="flex items-center">
             <img
-              ref={logoRef}
               src="/logo.png"
               alt="XLChess logo"
-              className="h-10 w-auto object-contain"
-              style={{
-                willChange: 'transform, filter',
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'center center',
-              }}
+              style={{ width: '220px', maxWidth: '240px', height: 'auto' }}
               draggable={false}
             />
           </div>

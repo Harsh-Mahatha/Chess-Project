@@ -35,8 +35,8 @@ export default function Hero() {
 
   // ── Perspective tilt hook (manages its own ref) ────────────────────────────
   const tiltRef = usePerspectiveTilt<HTMLDivElement>({
-    maxRotate:       10,
-    scalePeak:       1.04,
+    maxRotate:       6,
+    scalePeak:       1.03,
     quickToDuration: 0.35,
     quickToEase:     'power2.out',
     floatDistance:   8,
@@ -170,7 +170,7 @@ export default function Hero() {
                 ref={heroLogoRef}
                 src="/logo.png"
                 alt="XLChess logo"
-                className="h-14 sm:h-16 w-auto object-contain"
+                className="h-[72px] sm:h-[83px] w-auto object-contain"
                 style={{
                   willChange: 'transform, filter',
                   transformStyle: 'preserve-3d',

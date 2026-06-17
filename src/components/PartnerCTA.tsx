@@ -183,22 +183,17 @@ export default function ContactSection() {
                     setMessage(e.target.value);
                     if (messageError) setMessageError(validateMessage(e.target.value));
                   }}
-                  placeholder="Tell us how we can help you..."
+                  placeholder="Tell us how we can help you."
                   className={`w-full bg-brand-surface border rounded-lg px-4 py-2.5 text-sm text-white placeholder-brand-secondary/40 focus:outline-none transition-all font-sans resize-none ${
                     messageError
                       ? 'border-red-500/70 focus:border-red-500'
                       : 'border-brand-border focus:border-brand-accent/70'
                   }`}
                 />
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start">
                   {messageError ? (
                     <p className="text-xs text-red-400">{messageError}</p>
-                  ) : (
-                    <span />
-                  )}
-                  <span className={`text-[10px] shrink-0 ${message.length < 10 ? 'text-brand-secondary/50' : 'text-green-500/70'}`}>
-                    {message.length} / 10 min
-                  </span>
+                  ) : null}
                 </div>
               </div>
 

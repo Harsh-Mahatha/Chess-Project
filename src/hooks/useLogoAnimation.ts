@@ -44,8 +44,8 @@ export interface LogoAnimationRefs {
 }
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────
-const MAX_ROTATE        = 10;   // degrees — rotateX and rotateY cap
-const SCALE_HOVER       = 1.08;
+const MAX_ROTATE        = 6;    // degrees — rotateX and rotateY cap
+const SCALE_HOVER       = 1.03;
 const SCALE_REST        = 1;
 const FLOAT_DISTANCE    = 4;    // px — subtle float amplitude
 const FLOAT_DURATION    = 3;    // seconds

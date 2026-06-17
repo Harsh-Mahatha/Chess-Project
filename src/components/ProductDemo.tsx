@@ -9,9 +9,8 @@ import {
   Lightbulb,
   AlertCircle,
   CornerUpLeft,
-  MoreHorizontal,
-  ArrowRightLeft,
-  Settings,
+  Edit,
+  Shuffle,
 } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useButtonGlow } from '../hooks/useButtonGlow';
@@ -38,14 +37,13 @@ export default function ProductDemo() {
 
   // playerColor = the color the human plays (affects who makes moves)
   // boardOrientation = purely visual board flip (does NOT affect turn logic)
+  // @ts-ignore
   const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w');
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
 
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(3);
   const [showHint, setShowHint] = useState(false);
   const [gameOverReason, setGameOverReason] = useState<string | null>(null);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const moreMenuRef = useRef<HTMLDivElement>(null);
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const playAgainGlowRef = useButtonGlow<HTMLButtonElement>();
@@ -81,18 +79,7 @@ export default function ProductDemo() {
     }
   }, [gameFen]);
 
-  // Close More menu on outside click
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-        setShowMoreMenu(false);
-      }
-    };
-    if (showMoreMenu) {
-      document.addEventListener('mousedown', handleOutsideClick);
-    }
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [showMoreMenu]);
+  // Close More menu on outside click — removed (More menu removed)
 
   // AI move trigger — fires when it's the engine's turn
   useEffect(() => {
@@ -189,9 +176,9 @@ export default function ProductDemo() {
   }, [stopSearch, resetEvaluation]);
 
   // Switch Side — ONLY flips board orientation, never triggers engine move
+  // @ts-ignore
   const handleSwitchSide = useCallback(() => {
     setBoardOrientation((prev) => (prev === 'white' ? 'black' : 'white'));
-    setShowMoreMenu(false);
   }, []);
 
   // Eval bar computation
@@ -261,13 +248,25 @@ export default function ProductDemo() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
-            {/* ── Col 1: Eval Bar ─────────────────────────────────────────── */}
-            <div className="lg:col-span-1 flex lg:flex-col items-center justify-center gap-0 h-10 lg:h-auto self-stretch">
+            {/* ── Col 1: Eval Bar ──────────────────────────────────── */}
+            <div
+              className="lg:col-span-1 flex lg:flex-col items-center justify-center gap-0 h-10 lg:h-auto self-stretch"
+              style={{
+                padding: '4px',
+              }}
+            >
               {/* Eval bar: rectangular, full height of board column */}
-              <div className="relative w-full lg:w-6 h-3 lg:h-full bg-neutral-800 overflow-hidden border border-brand-border flex lg:flex-col-reverse items-start lg:items-end">
+              <div
+                className="relative w-full lg:w-6 h-3 lg:h-full overflow-hidden flex lg:flex-col-reverse items-start lg:items-end rounded"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
                 {/* White fill — grows from bottom on desktop, from left on mobile */}
                 <div
-                  className="bg-slate-100 transition-all duration-500 ease-out"
+                  className="bg-white/80 transition-all duration-500 ease-out"
                   style={{
                     width: '100%',
                     height: `${evalPercent}%`,
@@ -359,8 +358,8 @@ export default function ProductDemo() {
             {/* ── Col 3: Control Panel ─────────────────────────────────────── */}
             <div className="lg:col-span-4 flex flex-col gap-5">
 
-              {/* ── Toolbar ───────────────────────────────────────────────── */}
-              <div className="grid grid-cols-4 gap-2">
+              {/* ── Toolbar ───────────────────────────────────── */}
+              <div className="grid grid-cols-5 gap-2">
 
                 {/* Undo */}
                 <button
@@ -394,71 +393,29 @@ export default function ProductDemo() {
                   <span className="text-[10px] font-medium font-sans tracking-wide">Reset</span>
                 </button>
 
-                {/* More (…) */}
-                <div className="relative" ref={moreMenuRef}>
-                  <button
-                    onClick={() => setShowMoreMenu((prev) => !prev)}
-                    title="More options"
-                    className={`w-full flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border transition-all duration-200 group ${
-                      showMoreMenu
-                        ? 'border-brand-accent/50 bg-brand-accent/10 text-white'
-                        : 'border-brand-border bg-brand-bg hover:bg-white/5 hover:border-brand-accent/40 text-brand-secondary hover:text-white'
-                    }`}
-                  >
-                    <MoreHorizontal className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-medium font-sans tracking-wide">More</span>
-                  </button>
+                {/* Chess960 — disabled, Coming Soon */}
+                <button
+                  disabled
+                  title="Coming Soon"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg text-brand-secondary/40 cursor-not-allowed opacity-50"
+                >
+                  <Shuffle className="w-5 h-5" />
+                  <span className="text-[10px] font-medium font-sans tracking-wide">Chess960</span>
+                </button>
 
-                  {/* Popover */}
-                  {showMoreMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-52 bg-brand-surface border border-brand-border rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in">
-                      <div className="px-3 py-2 border-b border-brand-border/60">
-                        <span className="text-[10px] text-brand-secondary/60 font-medium uppercase tracking-wider">Options</span>
-                      </div>
-                      <div className="p-1.5 space-y-0.5">
-                        <button
-                          onClick={handleSwitchSide}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-brand-secondary hover:text-white hover:bg-white/5 transition-all duration-150 group"
-                        >
-                          <ArrowRightLeft className="w-4 h-4 text-brand-accent group-hover:scale-110 transition-transform" />
-                          <span className="font-sans font-medium">Switch Side</span>
-                        </button>
-                        <button
-                          disabled
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-brand-secondary/40 cursor-not-allowed"
-                          title="Coming soon"
-                        >
-                          <Settings className="w-4 h-4" />
-                          <span className="font-sans font-medium">Settings</span>
-                          <span className="ml-auto text-[9px] bg-brand-border px-1.5 py-0.5 rounded-full text-brand-secondary/60">Soon</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {/* Edit Position — disabled, Coming Soon */}
+                <button
+                  disabled
+                  title="Coming Soon"
+                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg text-brand-secondary/40 cursor-not-allowed opacity-50"
+                >
+                  <Edit className="w-5 h-5" />
+                  <span className="text-[10px] font-medium font-sans tracking-wide">Edit Pos.</span>
+                </button>
+
               </div>
 
-              {/* ── Play As ───────────────────────────────────────────────── */}
-              <div className="space-y-2 text-left">
-                <label className="text-xs font-sans text-brand-secondary">Play As</label>
-                <div className="grid grid-cols-2 gap-2 bg-brand-bg p-1 rounded-lg border border-brand-border">
-                  {(['w', 'b'] as const).map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setPlayerColor(color)}
-                      className={`py-1.5 rounded text-xs font-semibold font-sans transition-all duration-200 ${
-                        playerColor === color
-                          ? 'bg-brand-surface text-white shadow-sm border border-brand-border'
-                          : 'text-brand-secondary hover:text-white'
-                      }`}
-                    >
-                      {color === 'w' ? 'White' : 'Black'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* ── Difficulty ────────────────────────────────────────────── */}
+              {/* ── Difficulty ───────────────────────────────────── */}
               <div className="space-y-2 text-left">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-sans text-brand-secondary">Difficulty</label>
@@ -466,8 +423,8 @@ export default function ProductDemo() {
                     {currentConfig.name} ({currentConfig.rating})
                   </span>
                 </div>
-                <div className="grid grid-cols-7 gap-1 bg-brand-bg p-1 rounded-lg border border-brand-border">
-                  {([1, 2, 3, 4, 5, 6, 7] as DifficultyLevel[]).map((level) => (
+                <div className="grid grid-cols-5 gap-1 bg-brand-bg p-1 rounded-lg border border-brand-border">
+                  {([1, 2, 3, 4, 5] as DifficultyLevel[]).map((level) => (
                     <button
                       key={level}
                       onClick={() => {
@@ -485,9 +442,6 @@ export default function ProductDemo() {
                     </button>
                   ))}
                 </div>
-                <p className="text-[10px] text-brand-secondary mt-1 tracking-wide leading-normal">
-                  {currentConfig.description}
-                </p>
               </div>
 
               {/* ── Move History ──────────────────────────────────────────── */}

@@ -15,7 +15,7 @@
     and produces two scrollbars at the right edge of the viewport.
 */
 html {
-  background-color: #0B1020;
+  background-color: #050B1D;
   color: #F8FAFC;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;
@@ -66,7 +66,7 @@ html::-webkit-scrollbar,
 
 html::-webkit-scrollbar-track,
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #0f1629;
+  background: #050B1D;
   border-radius: 10px;
 }
 
@@ -74,7 +74,7 @@ html::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #6366F1 0%, #818CF8 50%, #6366F1 100%);
   border-radius: 10px;
-  border: 2px solid #0f1629; /* creates a gap between thumb and track */
+  border: 2px solid #050B1D; /* creates a gap between thumb and track */
   box-shadow: 0 0 6px rgba(99, 102, 241, 0.40);
   transition: box-shadow 0.2s ease;
 }
@@ -87,7 +87,7 @@ html::-webkit-scrollbar-thumb:hover,
 
 html::-webkit-scrollbar-corner,
 .overflow-y-auto::-webkit-scrollbar-corner {
-  background: #0f1629;
+  background: #050B1D;
 }
 
 /* ─── Move History Scrollbar — High-Contrast ─────────────────── */
@@ -103,7 +103,7 @@ html::-webkit-scrollbar-corner,
 }
 
 .move-history-scroll::-webkit-scrollbar-track {
-  background: #0a0f1f;
+  background: #050B1D;
   border-radius: 4px;
 }
 
@@ -121,7 +121,7 @@ html::-webkit-scrollbar-corner,
 }
 
 .move-history-scroll::-webkit-scrollbar-corner {
-  background: #0a0f1f;
+  background: #050B1D;
 }
 
 /* ─── Popover Fade-In ─────────────────────────────────────────── */
@@ -478,12 +478,8 @@ html::-webkit-scrollbar-corner,
   justify-content: center;
   padding: 16px 32px;
   border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 15, 30, 0.96) 0%,
-    rgba(30, 20, 60, 0.96) 100%
-  );
-  border: 1px solid rgba(99, 102, 241, 0.6);
+  background: rgba(24, 24, 45, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
     0 0 0 1px rgba(139, 92, 246, 0.3),
     0 8px 40px rgba(99, 102, 241, 0.5),

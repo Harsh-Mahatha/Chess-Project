@@ -38,9 +38,12 @@ import { Chess } from 'chess.js';
 import { RotateCcw, Play, Trophy, AlertTriangle, ChevronRight, Zap } from 'lucide-react';
 import { useConfetti } from '../hooks/useConfetti';
 import { useBoardCursorGlow } from '../hooks/useBoardCursorGlow';
+import Particles from '@tsparticles/react';
 import { useMoveTrail } from '../hooks/useMoveTrail';
 import { gsap } from '../utils/gsapConfig';
 import { prefersReducedMotion } from '../utils/gsapConfig';
+import { useMoveAnnotation } from '../hooks/useMoveAnnotation';
+import { MoveAnnotation } from './MoveAnnotation';
 
 // ── Board theme ──────────────────────────────────────────────────────────────
 const BOARD_DARK  = '#769656';
@@ -56,7 +59,7 @@ const PUZZLE = {
   // King square to pulse on checkmate (black king)
   kingSquare: 'e8',
   solution: [
-    { from: 'h5', to: 'f7', san: 'Qxf7+', annotation: 'Check! The queen strikes f7.' },
+    { from: 'h5', to: 'f7', san: 'Qf7+',  annotation: 'Check! The queen strikes f7.' },
     { from: 'd7', to: 'd6', san: '...d6',  annotation: "Black's only try — blocking the diagonal." },
     { from: 'f7', to: 'e6', san: 'Qe6#',  annotation: '✓ Checkmate! The queen covers every escape square.' },
   ],
@@ -76,9 +79,11 @@ type PuzzlePhase =
 type CheckmateImpact = 'none' | 'flashing' | 'overlay' | 'done';
 
 export default function HeroPuzzle() {
-  const { triggerConfetti }           = useConfetti();
+  const { showConfetti, triggerConfetti } = useConfetti();
+  const [confettiOrigin, setConfettiOrigin] = useState({ x: 50, y: 35 });
   const glowRef                       = useBoardCursorGlow<HTMLDivElement>();
   const { svgRef, showTrail, clearTrail } = useMoveTrail();
+  const { activeAnnotation, triggerAnnotation, clearAnnotation } = useMoveAnnotation();
 
   // ── Chess state ────────────────────────────────────────────────────────────
   const gameRef = useRef(new Chess(PUZZLE.fen));
@@ -230,6 +235,12 @@ export default function HeroPuzzle() {
 
     // Brief hold on the CHECKMATE text, then transition to puzzle-solved state
     await new Promise(r => setTimeout(r, 900));
+    if (boardInnerRef.current) {
+      const rect = boardInnerRef.current.getBoundingClientRect();
+      const originX = (rect.left + rect.width / 2) / window.innerWidth;
+      const originY = (rect.top + rect.height / 2) / window.innerHeight;
+      setConfettiOrigin({ x: originX * 100, y: originY * 100 });
+    }
     triggerConfetti();
     setCheckmateImpact('done');
     setPhase('solved');
@@ -253,25 +264,35 @@ export default function HeroPuzzle() {
       const lastEntry = history[history.length - 1];
 
       if (phase === 'idle') {
-        // White's first move
-        addNotation(`1. ${lastEntry.san}`);
+        // White's first move — strip capture 'x' for clean display (Qxf7+ → Qf7+)
+        const displaySan = lastEntry.san.replace('x', '');
+        addNotation(`1. ${displaySan}`);
         setMovesLeft(1);
         setPhase('black_responding');
+
+        // Show White first move annotation !?
+        triggerAnnotation(targetSquare, '!?');
 
         // Black auto-responds d7→d6 after 600ms
         setTimeout(() => {
           const ok = applyMove(PUZZLE.blackResponse.from, PUZZLE.blackResponse.to);
           if (ok) {
             const hist = gameRef.current.history({ verbose: true });
-            addNotation(`   ...${hist[hist.length - 1].san}`);
+            const blackSan = hist[hist.length - 1].san.replace('x', '');
+            addNotation(`   ...${blackSan}`);
+            // Show Black move annotation ?
+            triggerAnnotation(PUZZLE.blackResponse.to, '?');
           }
           setPhase('awaiting_mate');
         }, 600);
 
       } else if (phase === 'awaiting_mate') {
-        // White's second move — must be checkmate
-        addNotation(`2. ${lastEntry.san}`);
+        // White's second move — strip capture 'x' for clean display
+        const displaySan = lastEntry.san.replace('x', '');
+        addNotation(`2. ${displaySan}`);
         if (game.isCheckmate()) {
+          // Show White final mating move annotation !!
+          triggerAnnotation(targetSquare, '!!');
           celebrate();
         } else {
           setPhase('failed');
@@ -281,7 +302,7 @@ export default function HeroPuzzle() {
 
       return true;
     },
-    [phase, applyMove, addNotation, celebrate]
+    [phase, applyMove, addNotation, celebrate, triggerAnnotation]
   );
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -302,6 +323,7 @@ export default function HeroPuzzle() {
     setKingPulse(false);
     hasCelebratedRef.current = false;
     clearTrail();
+    clearAnnotation();
     if (boardCardRef.current) boardCardRef.current.style.boxShadow = '';
     if (checkmateRef.current) {
       gsap.killTweensOf(checkmateRef.current);
@@ -312,7 +334,7 @@ export default function HeroPuzzle() {
       setPhase('solving');
       setSolveStep(0);
     }, 200);
-  }, [clearTrail]);
+  }, [clearTrail, clearAnnotation]);
 
   const resetPuzzle = useCallback(() => {
     if (solveTimerRef.current) { clearTimeout(solveTimerRef.current); solveTimerRef.current = null; }
@@ -328,12 +350,13 @@ export default function HeroPuzzle() {
     setKingPulse(false);
     hasCelebratedRef.current = false;
     clearTrail();
+    clearAnnotation();
     if (boardCardRef.current) boardCardRef.current.style.boxShadow = '';
     if (checkmateRef.current) {
       gsap.killTweensOf(checkmateRef.current);
       gsap.set(checkmateRef.current, { display: 'none', opacity: 0, scale: 0.6 });
     }
-  }, [clearTrail]);
+  }, [clearTrail, clearAnnotation]);
 
   // Solve animation stepper
   useEffect(() => {
@@ -345,6 +368,7 @@ export default function HeroPuzzle() {
 
     solveTimerRef.current = setTimeout(() => {
       setSolveAnnotation(step.annotation);
+      // Use PUZZLE solution san directly (already clean format without 'x')
       if (step.san.startsWith('...')) {
         addNotation(`   ${step.san}`);
       } else {
@@ -352,6 +376,14 @@ export default function HeroPuzzle() {
       }
 
       applyMove(step.from, step.to);
+
+      if (solveStep === 0) {
+        triggerAnnotation(step.to, '!?');
+      } else if (solveStep === 1) {
+        triggerAnnotation(step.to, '?');
+      } else if (solveStep === 2) {
+        triggerAnnotation(step.to, '!!');
+      }
 
       const next = solveStep + 1;
       if (next >= PUZZLE.solution.length) {
@@ -363,7 +395,7 @@ export default function HeroPuzzle() {
 
     return () => { if (solveTimerRef.current) clearTimeout(solveTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [solveStep, phase]);
+  }, [solveStep, phase, triggerAnnotation]);
 
   // ── Magnetic piece hover effect ────────────────────────────────────────────
   useEffect(() => {
@@ -583,6 +615,9 @@ export default function HeroPuzzle() {
                 allowDragging: isInteractive,
               }}
             />
+
+            {/* ── Move Quality Annotation Badge ── */}
+            <MoveAnnotation activeAnnotation={activeAnnotation} />
           </div>
         </div>
       </div>{/* end board-cursor-glow */}
@@ -691,6 +726,92 @@ export default function HeroPuzzle() {
           Reset
         </button>
       </div>
+
+      {showConfetti && (
+        <Particles
+          id="tsparticles-confetti"
+          options={{
+            preset: 'confetti-cannon',
+            fullScreen: { enable: true, zIndex: 9999 },
+            detectRetina: true,
+            interactivity: {
+              events: {
+                onClick: { enable: false },
+                onHover: { enable: false },
+              },
+            },
+            emitters: {
+              life: {
+                count: 1,
+                duration: 0.1,
+                delay: 0,
+              },
+              rate: {
+                quantity: 150,
+                delay: 0,
+              },
+              position: confettiOrigin,
+            },
+            particles: {
+              color: {
+                value: [
+                  '#6366F1',
+                  '#818CF8',
+                  '#FFD700',
+                  '#FFFFFF',
+                ],
+              },
+              move: {
+                decay: 0.05,
+                direction: 'top' as const,
+                enable: true,
+                gravity: {
+                  enable: true,
+                  acceleration: 10,
+                },
+                outModes: { default: 'destroy' as const },
+                speed: { min: 10, max: 50 },
+              },
+              number: { value: 0 },
+              opacity: {
+                value: 1,
+                animation: {
+                  enable: true,
+                  minimumValue: 0,
+                  speed: 0.5,
+                  startValue: 'max' as const,
+                  destroy: 'min' as const,
+                  sync: true,
+                },
+              },
+              rotate: {
+                value: { min: 0, max: 360 },
+                direction: 'random' as const,
+                animation: { enable: true, speed: 60 },
+              },
+              tilt: {
+                direction: 'random' as const,
+                enable: true,
+                value: { min: 0, max: 360 },
+                animation: { enable: true, speed: 60 },
+              },
+              size: { value: { min: 4, max: 8 } },
+              wobble: {
+                distance: 30,
+                enable: true,
+                speed: { min: -10, max: 10 },
+              },
+              life: {
+                count: 1,
+                duration: { sync: true, value: 2 },
+              },
+              shape: {
+                type: ['circle', 'square'],
+              },
+            },
+          }}
+        />
+      )}
     </div>
   );
 }

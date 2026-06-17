@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         brand: {
-          bg: '#0B1020',
-          surface: '#111827',
+          bg: '#050B1D',
+          surface: '#050B1D',
           accent: '#6366F1',
           text: '#F8FAFC',
           secondary: '#94A3B8',
