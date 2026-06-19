@@ -138,6 +138,7 @@ export default function Hero() {
     <header
       ref={heroRef}
       className="relative pt-16 pb-16 md:pt-24 md:pb-28 overflow-hidden bg-brand-bg"
+      id="hero-section"
     >
       {/* ── Background glow orbs (CSS animated — GPU composited) ─────────── */}
       <div
@@ -170,8 +171,11 @@ export default function Hero() {
                 ref={heroLogoRef}
                 src="/logo.png"
                 alt="XLChess logo"
-                className="w-[75px] sm:w-[85px] h-auto object-contain"
+                className="object-contain"
                 style={{
+                  height: '80px',
+                  width: 'auto',
+                  maxWidth: 'none',
                   willChange: 'transform',
                   transformOrigin: 'center center',
                 }}

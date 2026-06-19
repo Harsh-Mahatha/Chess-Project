@@ -9,8 +9,6 @@ import {
   Lightbulb,
   AlertCircle,
   CornerUpLeft,
-  Edit,
-  Shuffle,
 } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useButtonGlow } from '../hooks/useButtonGlow';
@@ -61,6 +59,46 @@ export default function ProductDemo() {
 
   // Move history container — scroll inside the box, never the page
   const moveHistoryContainerRef = useRef<HTMLDivElement>(null);
+
+  // ── Layout measurements for exact sizing alignment ───────────────────────
+  const [boardHeight, setBoardHeight] = useState<number>(0);
+  const [controlsHeight, setControlsHeight] = useState<number>(0);
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
+
+  const boardContainerRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const measure = () => {
+      if (boardContainerRef.current) {
+        setBoardHeight(boardContainerRef.current.getBoundingClientRect().height);
+      }
+      if (controlsRef.current) {
+        setControlsHeight(controlsRef.current.getBoundingClientRect().height);
+      }
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    measure();
+
+    const resizeObserver = new ResizeObserver(() => {
+      measure();
+    });
+
+    if (boardContainerRef.current) {
+      resizeObserver.observe(boardContainerRef.current);
+    }
+    if (controlsRef.current) {
+      resizeObserver.observe(controlsRef.current);
+    }
+
+    window.addEventListener('resize', measure);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
 
   // ScrollTrigger reveal ref for the dashboard
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -246,36 +284,35 @@ export default function ProductDemo() {
           className="bg-brand-surface border border-brand-border rounded-xl shadow-2xl p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto"
           style={{ opacity: 0 }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:items-stretch">
 
             {/* ── Col 1: Eval Bar ──────────────────────────────────── */}
             <div
-              className="lg:col-span-1 flex lg:flex-col items-center justify-center gap-0 h-10 lg:h-auto self-stretch"
-              style={{
-                padding: '4px',
-              }}
+              className="lg:col-span-1 flex lg:flex-col items-center justify-start gap-0 self-stretch"
+              style={{ padding: '4px 0' }}
             >
-              {/* Eval bar: rectangular, full height of board column */}
+              {/* Eval bar: 16px wide, 8px radius */}
               <div
-                className="relative w-full lg:w-6 h-3 lg:h-full overflow-hidden flex lg:flex-col-reverse items-start lg:items-end rounded"
+                className="relative overflow-hidden flex lg:flex-col-reverse items-start lg:items-end"
                 style={{
+                  width: isDesktop ? '16px' : '100%',
+                  borderRadius: '8px',
+                  height: isDesktop && boardHeight ? `${boardHeight}px` : '16px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
                   backdropFilter: 'blur(8px)',
                 }}
               >
-                {/* White fill — grows from bottom on desktop, from left on mobile */}
                 <div
                   className="bg-white/80 transition-all duration-500 ease-out"
                   style={{
-                    width: '100%',
-                    height: `${evalPercent}%`,
+                    width: isDesktop ? '100%' : `${evalPercent}%`,
+                    height: isDesktop ? `${evalPercent}%` : '100%',
                   }}
                 />
-                {/* Score label — centered over the bar */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span
-                    className="font-mono font-bold text-[9px] px-1 py-0.5 shadow-sm leading-none"
+                    className="font-mono font-bold text-[8px] px-0.5 py-0.5 shadow-sm leading-none"
                     style={{
                       backgroundColor: evalIsNegative ? '#111827' : '#ffffff',
                       color: evalIsNegative ? '#ffffff' : '#111827',
@@ -289,7 +326,7 @@ export default function ProductDemo() {
 
             {/* ── Col 2: Chessboard ────────────────────────────────────────── */}
             <div className="lg:col-span-7 flex flex-col justify-center">
-              <div className="aspect-square w-full shadow-xl border border-brand-border relative overflow-hidden">
+              <div ref={boardContainerRef} className="aspect-square w-full shadow-xl border border-brand-border relative overflow-hidden">
 
                 {/* Game Over Overlay */}
                 {gameOverReason && (
@@ -356,96 +393,85 @@ export default function ProductDemo() {
             </div>
 
             {/* ── Col 3: Control Panel ─────────────────────────────────────── */}
-            <div className="lg:col-span-4 flex flex-col justify-between gap-6 h-full">
+            <div className="lg:col-span-4 flex flex-col gap-5 lg:self-stretch">
 
-              {/* ── Toolbar ───────────────────────────────────── */}
-              <div className="grid grid-cols-5 gap-2">
+              <div ref={controlsRef} className="flex flex-col gap-5">
+                {/* ── Toolbar ───────────────────────────────────── */}
+                <div className="grid grid-cols-3 gap-2">
 
-                {/* Undo */}
-                <button
-                  onClick={handleUndo}
-                  disabled={!canUndo || isThinking}
-                  title="Undo last move"
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-brand-accent/40 text-brand-secondary hover:text-white transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none group"
-                >
-                  <CornerUpLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-medium font-sans tracking-wide">Undo</span>
-                </button>
+                  {/* Undo */}
+                  <button
+                    onClick={handleUndo}
+                    disabled={!canUndo || isThinking}
+                    title="Undo last move"
+                    className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-brand-accent/40 text-brand-secondary hover:text-white transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none group"
+                  >
+                    <CornerUpLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-medium font-sans tracking-wide">Undo</span>
+                  </button>
 
-                {/* Hint */}
-                <button
-                  onClick={handleHint}
-                  disabled={!!gameOverReason || isThinking || game_is_human_turn(currentTurn, playerColor) === false}
-                  title="Get a hint"
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-brand-accent/40 text-brand-secondary hover:text-yellow-400 transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none group"
-                >
-                  <Lightbulb className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-medium font-sans tracking-wide">Hint</span>
-                </button>
+                  {/* Hint */}
+                  <button
+                    onClick={handleHint}
+                    disabled={!!gameOverReason || isThinking || game_is_human_turn(currentTurn, playerColor) === false}
+                    title="Get a hint"
+                    className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-brand-accent/40 text-brand-secondary hover:text-yellow-400 transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none group"
+                  >
+                    <Lightbulb className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-medium font-sans tracking-wide">Hint</span>
+                  </button>
 
-                {/* Reset */}
-                <button
-                  onClick={handleReset}
-                  title="Reset game"
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-red-500/40 text-brand-secondary hover:text-red-400 transition-all duration-200 group"
-                >
-                  <RotateCcw className="w-5 h-5 group-hover:rotate-[-45deg] transition-transform duration-300" />
-                  <span className="text-[10px] font-medium font-sans tracking-wide">Reset</span>
-                </button>
+                  {/* Reset */}
+                  <button
+                    onClick={handleReset}
+                    title="Reset game"
+                    className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg hover:bg-white/5 hover:border-red-500/40 text-brand-secondary hover:text-red-400 transition-all duration-200 group"
+                  >
+                    <RotateCcw className="w-5 h-5 group-hover:rotate-[-45deg] transition-transform duration-300" />
+                    <span className="text-[10px] font-medium font-sans tracking-wide">Reset</span>
+                  </button>
 
-                {/* Chess960 — disabled, Coming Soon */}
-                <button
-                  disabled
-                  title="Coming Soon"
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg text-brand-secondary/40 cursor-not-allowed opacity-50"
-                >
-                  <Shuffle className="w-5 h-5" />
-                  <span className="text-[10px] font-medium font-sans tracking-wide">Chess960</span>
-                </button>
-
-                {/* Edit Position — disabled, Coming Soon */}
-                <button
-                  disabled
-                  title="Coming Soon"
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-lg border border-brand-border bg-brand-bg text-brand-secondary/40 cursor-not-allowed opacity-50"
-                >
-                  <Edit className="w-5 h-5" />
-                  <span className="text-[10px] font-medium font-sans tracking-wide">Edit Pos.</span>
-                </button>
-
-              </div>
-
-              {/* ── Difficulty ───────────────────────────────────── */}
-              <div className="space-y-2 text-left">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-sans text-brand-secondary">Difficulty</label>
-                  <span className="text-xs font-semibold text-brand-accent font-sans">
-                    {currentConfig.name} ({currentConfig.rating})
-                  </span>
                 </div>
-                <div className="grid grid-cols-5 gap-1 bg-brand-bg p-1 rounded-lg border border-brand-border">
-                  {([1, 2, 3, 4, 5] as DifficultyLevel[]).map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => {
-                        setDifficulty(level);
-                        setShowHint(false);
-                      }}
-                      title={`${DIFFICULTY_CONFIGS[level].name} (${DIFFICULTY_CONFIGS[level].rating})`}
-                      className={`py-1 rounded text-xs font-mono transition-all duration-200 ${
-                        difficulty === level
-                          ? 'bg-brand-accent text-white shadow-sm font-bold'
-                          : 'text-brand-secondary hover:bg-white/5'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
+
+                {/* ── Difficulty ───────────────────────────────────── */}
+                <div className="space-y-2 text-left">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-sans text-brand-secondary">Difficulty</label>
+                    <span className="text-xs font-semibold text-brand-accent font-sans">
+                      {currentConfig.name} ({currentConfig.rating})
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1 bg-brand-bg p-1 rounded-lg border border-brand-border">
+                    {([1, 2, 3, 4, 5] as DifficultyLevel[]).map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => {
+                          setDifficulty(level);
+                          setShowHint(false);
+                        }}
+                        title={`${DIFFICULTY_CONFIGS[level].name} (${DIFFICULTY_CONFIGS[level].rating})`}
+                        className={`py-1 rounded text-xs font-mono transition-all duration-200 ${
+                          difficulty === level
+                            ? 'bg-brand-accent text-white shadow-sm font-bold'
+                            : 'text-brand-secondary hover:bg-white/5'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* ── Move History ──────────────────────────────────────────── */}
-              <div className="flex-1 flex flex-col justify-start text-left lg:mb-8 min-h-[220px]">
+              <div
+                className="flex flex-col text-left"
+                style={{
+                  height: isDesktop && boardHeight && controlsHeight
+                    ? `${Math.max(120, boardHeight - controlsHeight - 20)}px`
+                    : '220px'
+                }}
+              >
                 <div
                   ref={moveHistoryContainerRef}
                   className="flex-1 overflow-y-auto border border-brand-border/60 rounded-lg p-3 bg-brand-bg/40 font-mono text-sm space-y-1 move-history-scroll"

@@ -549,7 +549,7 @@ html::-webkit-scrollbar-corner,
 
 /* ── Piece lift refinement (upgrade from previous rule) ────────────────────
    Use :where() to lower specificity so the library can still override.      */
-:where([data-testid^="piece-"]) {
+:where([data-testid^="piece-"]):not(.gsap-moving) {
   --mag-x: 0px;
   --mag-y: 0px;
   --lift-y: 0px;
