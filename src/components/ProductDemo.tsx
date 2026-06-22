@@ -56,7 +56,6 @@ export default function ProductDemo() {
     evaluation,
     bestMove,
     isThinking,
-    engineDepth,
     getEngineMove,
     analyzePosition,
     stopSearch,
@@ -340,14 +339,13 @@ export default function ProductDemo() {
 
             {/* ── Col 1: Eval Bar ──────────────────────────────────── */}
             <div
-              className="lg:col-span-1 flex lg:flex-col items-center justify-start gap-0 self-stretch"
-              style={{ padding: '4px 0' }}
+              className="lg:col-span-1 flex flex-col items-center justify-start gap-2 self-start py-1"
             >
-              {/* Eval bar: 16px wide, 8px radius */}
+              {/* Eval bar: wider vertical meter with label below */}
               <div
                 className="relative overflow-hidden flex lg:flex-col-reverse items-start lg:items-end"
                 style={{
-                  width: isDesktop ? '16px' : '100%',
+                  width: isDesktop ? '24px' : '100%',
                   borderRadius: '8px',
                   height: isDesktop && boardHeight ? `${boardHeight}px` : '16px',
                   background: 'rgba(255,255,255,0.04)',
@@ -362,17 +360,17 @@ export default function ProductDemo() {
                     height: isDesktop ? `${evalPercent}%` : '100%',
                   }}
                 />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span
-                    className="font-mono font-bold text-[8px] px-0.5 py-0.5 shadow-sm leading-none"
-                    style={{
-                      backgroundColor: evalIsNegative ? '#111827' : '#ffffff',
-                      color: evalIsNegative ? '#ffffff' : '#111827',
-                    }}
-                  >
-                    {evalLabel}
-                  </span>
-                </div>
+              </div>
+              <div className="flex justify-center pointer-events-none">
+                <span
+                  className="font-mono font-semibold text-sm sm:text-base lg:text-lg px-2 py-1 shadow-sm leading-none rounded-md"
+                  style={{
+                    backgroundColor: evalIsNegative ? '#111827' : '#ffffff',
+                    color: evalIsNegative ? '#ffffff' : '#111827',
+                  }}
+                >
+                  {evalLabel}
+                </span>
               </div>
             </div>
 
@@ -425,7 +423,7 @@ export default function ProductDemo() {
                   }`}
                 />
                 <span>
-                  {currentTurn === 'w' ? "White's turn" : "Black's turn"}
+                  {currentTurn === 'w' ? 'White Turn' : 'Black Turn'}
                   {isEditMode && (
                     <span className="text-brand-accent ml-1.5 font-medium">
                       (Edit Position Mode)
@@ -435,9 +433,6 @@ export default function ProductDemo() {
                     <span className="text-brand-accent animate-pulse ml-1.5 font-medium">
                       (AI Thinking...)
                     </span>
-                  )}
-                  {engineDepth > 0 && (
-                    <span className="ml-1.5 text-brand-secondary/60">(d:{engineDepth})</span>
                   )}
                 </span>
                 {showHint && bestMove && (
@@ -450,9 +445,9 @@ export default function ProductDemo() {
             </div>
 
             {/* ── Col 3: Control Panel ─────────────────────────────────────── */}
-            <div className="lg:col-span-4 flex flex-col gap-5 lg:self-stretch">
+            <div className="lg:col-span-4 flex flex-col gap-10 lg:self-stretch">
 
-              <div ref={controlsRef} className="flex flex-col gap-5">
+              <div ref={controlsRef} className="flex flex-col gap-8">
                 {/* ── Toolbar ───────────────────────────────────── */}
                 <div className="grid grid-cols-5 gap-2">
 
