@@ -108,6 +108,7 @@ export default function HeroPuzzle() {
   const solveAbortRef                     = useRef(false);
 
   // ── Notation panel ─────────────────────────────────────────────────────────
+  const [, setNotationEntries] = useState<string[]>([]);
   const notationRef                       = useRef<HTMLDivElement>(null);
 
   // ── Celebration guard ──────────────────────────────────────────────────────
