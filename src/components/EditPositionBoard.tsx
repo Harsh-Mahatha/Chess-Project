@@ -27,6 +27,7 @@ interface EditPositionBoardProps {
   selectedTool: EditorTool | null;
   boardOrientation: BoardOrientation;
   onPositionChange: (position: PositionDataType) => void;
+  boardSize?: number;
 }
 
 export function EditPositionBoard({
@@ -34,6 +35,7 @@ export function EditPositionBoard({
   selectedTool,
   boardOrientation,
   onPositionChange,
+  boardSize,
 }: EditPositionBoardProps) {
   const boardFrameRef = useRef<HTMLDivElement>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
@@ -139,7 +141,8 @@ export function EditPositionBoard({
   return (
     <div
       ref={boardFrameRef}
-      className="relative aspect-square w-full max-w-[820px] mx-auto overflow-hidden rounded-xl border border-brand-border shadow-xl touch-none select-none"
+      className="relative aspect-square overflow-hidden rounded-xl border border-brand-border shadow-xl touch-none select-none"
+      style={boardSize ? { width: `${boardSize}px`, height: `${boardSize}px`, maxWidth: '100%' } : undefined}
     >
       <Chessboard
         options={{
@@ -194,7 +197,7 @@ export function EditPositionBoard({
       />
 
       <div className="pointer-events-none absolute inset-0 z-10">
-        <div className="absolute bottom-1.5 left-2 right-2 grid grid-cols-8 text-[10px] font-semibold uppercase tracking-[0.08em] text-black/35">
+        <div className="absolute bottom-1.5 left-2 right-2 grid grid-cols-8 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/28">
           {fileLabels.map((file) => (
             <span key={file} className="justify-self-center">
               {file}
@@ -202,7 +205,7 @@ export function EditPositionBoard({
           ))}
         </div>
 
-        <div className="absolute left-1.5 top-2 bottom-2 grid grid-rows-8 text-[10px] font-semibold text-black/35">
+        <div className="absolute left-1.5 top-2 bottom-2 grid grid-rows-8 text-[10px] font-semibold text-white/28">
           {rankLabels.map((rank) => (
             <span key={rank} className="self-center">
               {rank}
