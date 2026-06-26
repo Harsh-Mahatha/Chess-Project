@@ -9,14 +9,12 @@ interface EvaluationBarProps {
 export function EvaluationBar({ evaluation, isDesktop, boardHeight }: EvaluationBarProps) {
   let evalPercent = 50;
   let evalLabel = '0.0';
-  let evalIsNegative = false;
 
   if (evaluation) {
     if (evaluation.type === 'cp') {
       const val = evaluation.value;
       const clamped = Math.max(-8, Math.min(8, val));
       evalPercent = ((clamped + 8) / 16) * 100;
-      evalIsNegative = val < 0;
       const rounded = parseFloat(val.toFixed(1));
       if (rounded === 0) {
         evalLabel = '0.0';
@@ -26,7 +24,6 @@ export function EvaluationBar({ evaluation, isDesktop, boardHeight }: Evaluation
     } else {
       const val = evaluation.value;
       evalPercent = val > 0 ? 95 : 5;
-      evalIsNegative = val < 0;
       evalLabel = `M${Math.abs(val)}`;
     }
   }
