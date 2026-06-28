@@ -7,7 +7,6 @@ import {
   createEmptyEditorState,
   createStandardEditorState,
   parseFenToEditorState,
-  switchEditorSides,
   type EditorPositionState,
   type EditorTool,
 } from '../utils/positionEditor';
@@ -25,6 +24,7 @@ interface EditPositionModalProps {
   initialFen: string;
   isOpen: boolean;
   boardOrientation: BoardOrientation;
+  onSwitchSides: () => void;
   onApply: (fen: string) => void;
   onCancel: () => void;
   onValidate: (state: EditorPositionState) => string | null;
@@ -34,6 +34,7 @@ export function EditPositionModal({
   initialFen,
   isOpen,
   boardOrientation,
+  onSwitchSides,
   onApply,
   onCancel,
   onValidate,
@@ -148,18 +149,20 @@ export function EditPositionModal({
   };
 
   const handleSwitchSides = () => {
-    setEditorState((current) => switchEditorSides(current));
+    onSwitchSides();
     setSelectedTool(null);
     setLoadErrorMessage(null);
   };
 
+  const isEraserActive = selectedTool === 'erase';
+
   return (
     <div className="fixed inset-0 z-40 overflow-hidden bg-brand-bg/85 px-3 py-3 backdrop-blur-sm">
       <div className="mx-auto flex h-[calc(100vh-1.5rem)] max-h-[calc(100vh-1.5rem)] max-w-[1460px] items-stretch">
-        <div className="relative flex h-full w-full overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-2xl">
+        <div className={`relative flex h-full w-full overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-2xl ${isEraserActive ? 'eraser-mode-active' : ''}`}>
           <button
             onClick={onCancel}
-            className="absolute right-4 top-4 z-20 rounded-md border border-brand-border bg-brand-bg/80 p-2 text-brand-secondary transition-colors hover:bg-white/10 hover:text-white"
+            className="absolute right-4 top-2.5 z-20 rounded-md border border-brand-border bg-brand-bg/80 p-2 text-brand-secondary transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Close editor"
             title="Close"
           >
@@ -181,8 +184,8 @@ export function EditPositionModal({
               />
             </div>
 
-            <div className="min-h-0 overflow-hidden px-3 py-3 sm:px-4 sm:py-4">
-              <div className="flex h-full min-h-0 flex-col gap-2 overflow-hidden">
+            <div className="min-h-0 overflow-hidden px-3 py-3 sm:px-4 sm:py-4 xl:pt-14">
+              <div className="flex h-full min-h-0 flex-col gap-2">
                 <div className="grid grid-cols-1 gap-2">
                   {PIECE_ROWS.map((row, rowIndex) => (
                     <div
@@ -197,11 +200,10 @@ export function EditPositionModal({
                           <button
                             key={pieceCode}
                             onClick={() => selectTool(pieceCode)}
-                            className={`flex aspect-square items-center justify-center rounded-lg border transition-all ${
-                              isSelected
-                                ? 'border-purple-400 bg-purple-400/15 text-white shadow-[0_0_0_1px_rgba(192,132,252,0.45),0_0_24px_rgba(192,132,252,0.22)] scale-105'
-                                : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
-                            }`}
+                            className={`flex aspect-square items-center justify-center rounded-lg border transition-all ${isSelected
+                              ? 'border-purple-400 bg-purple-400/15 text-white shadow-[0_0_0_1px_rgba(192,132,252,0.45),0_0_24px_rgba(192,132,252,0.22)] scale-105'
+                              : 'border-brand-border bg-slate-700/50 text-brand-secondary hover:bg-white/5 hover:text-white'
+                              }`}
                             title={pieceCode}
                           >
                             <span className="h-8 w-8">
@@ -216,17 +218,41 @@ export function EditPositionModal({
 
                 <button
                   onClick={() => selectTool('erase')}
-                  className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 transition-all ${
-                    selectedTool === 'erase'
-                      ? 'border-purple-400 bg-purple-400/15 text-white shadow-[0_0_0_1px_rgba(192,132,252,0.45),0_0_24px_rgba(192,132,252,0.22)] scale-[1.02]'
-                      : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
-                  }`}
+                  className={`flex items-center justify-center gap-3 rounded-lg border px-4 py-2.5 transition-all ${selectedTool === 'erase'
+                    ? 'border-purple-400 bg-purple-400/15 text-white shadow-[0_0_0_1px_rgba(192,132,252,0.45),0_0_24px_rgba(192,132,252,0.22)] scale-[1.02]'
+                    : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
+                    }`}
+                  role="checkbox"
+                  aria-checked={selectedTool === 'erase'}
+                  title="Eraser Mode"
                 >
+                  {/* Custom Checkbox UI */}
+                  <div
+                    className={`relative flex items-center justify-center w-5 h-5 rounded-md border transition-all duration-200 ${selectedTool === 'erase'
+                      ? 'border-purple-400 bg-purple-500 text-white scale-100 shadow-[0_0_12px_rgba(192,132,252,0.45)]'
+                      : 'border-brand-secondary/40 bg-brand-bg text-transparent'
+                      }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`w-3.5 h-3.5 transition-all duration-200 transform ${selectedTool === 'erase' ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                        }`}
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+
+                  {/* Restored Eraser Icon */}
                   <Eraser className="w-4 h-4" />
-                  Eraser
                 </button>
 
-                <section className="grid min-h-0 flex-1 gap-2 overflow-hidden xl:grid-rows-[auto_auto_1fr_auto]">
+                <section className="flex flex-col min-h-0 flex-1 overflow-y-auto pr-1.5 gap-2 scrollbar-thin">
                   <div className="rounded-xl border border-brand-border bg-brand-bg/50 p-2.5">
                     <div className="grid grid-cols-2 gap-1.5">
                       {(['w', 'b'] as const).map((color) => (
@@ -236,11 +262,10 @@ export function EditPositionModal({
                             setEditorState((current) => ({ ...current, activeColor: color }));
                             setLoadErrorMessage(null);
                           }}
-                          className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
-                            editorState.activeColor === color
-                              ? 'border-brand-accent bg-brand-accent/15 text-white'
-                              : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
-                          }`}
+                          className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${editorState.activeColor === color
+                            ? 'border-brand-accent bg-brand-accent/15 text-white'
+                            : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
+                            }`}
                         >
                           {color === 'w' ? 'White to move' : 'Black to move'}
                         </button>
@@ -248,46 +273,182 @@ export function EditPositionModal({
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-brand-border bg-brand-bg/50 p-2.5">
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {(['K', 'Q', 'k', 'q'] as const).map((flag) => (
-                        <button
-                          key={flag}
-                          onClick={() => {
-                            setEditorState((current) => ({
-                              ...current,
-                              castlingRights: {
-                                ...current.castlingRights,
-                                [flag]: !current.castlingRights[flag],
-                              },
-                            }));
-                            setLoadErrorMessage(null);
-                          }}
-                          className={`rounded-lg border px-3 py-1.5 text-sm font-semibold transition-all ${
-                            editorState.castlingRights[flag]
-                              ? 'border-brand-accent bg-brand-accent/15 text-white'
-                              : 'border-brand-border bg-brand-bg text-brand-secondary hover:bg-white/5 hover:text-white'
-                          }`}
-                        >
-                          {flag}
-                        </button>
-                      ))}
+                  <div className="rounded-xl border border-brand-border bg-brand-bg/50 p-3">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                      {/* White Castling Rights (Left Column) */}
+                      <div className="space-y-2 text-left">
+                        <div className="text-xs font-semibold text-brand-secondary font-sans uppercase tracking-wider">White</div>
+                        <div className="flex flex-col gap-2 pl-1">
+                          <label className="flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none group">
+                            <input
+                              type="checkbox"
+                              checked={editorState.castlingRights.K}
+                              onChange={() => {
+                                setEditorState((current) => ({
+                                  ...current,
+                                  castlingRights: { ...current.castlingRights, K: !current.castlingRights.K }
+                                }));
+                                setLoadErrorMessage(null);
+                              }}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`relative flex items-center justify-center w-5 h-5 rounded-md border transition-all duration-200 ${editorState.castlingRights.K
+                                ? 'border-brand-accent bg-brand-accent text-white scale-100 shadow-[0_0_12px_rgba(99,102,241,0.45)]'
+                                : 'border-brand-border bg-brand-bg text-transparent group-hover:border-brand-accent/50'
+                                }`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`w-3.5 h-3.5 transition-all duration-200 transform ${editorState.castlingRights.K ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                                  }`}
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
+                            <span className="font-sans font-medium text-brand-secondary group-hover:text-white transition-colors duration-150">
+                              (O-O)
+                            </span>
+                          </label>
+                          <label className="flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none group">
+                            <input
+                              type="checkbox"
+                              checked={editorState.castlingRights.Q}
+                              onChange={() => {
+                                setEditorState((current) => ({
+                                  ...current,
+                                  castlingRights: { ...current.castlingRights, Q: !current.castlingRights.Q }
+                                }));
+                                setLoadErrorMessage(null);
+                              }}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`relative flex items-center justify-center w-5 h-5 rounded-md border transition-all duration-200 ${editorState.castlingRights.Q
+                                ? 'border-brand-accent bg-brand-accent text-white scale-100 shadow-[0_0_12px_rgba(99,102,241,0.45)]'
+                                : 'border-brand-border bg-brand-bg text-transparent group-hover:border-brand-accent/50'
+                                }`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`w-3.5 h-3.5 transition-all duration-200 transform ${editorState.castlingRights.Q ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                                  }`}
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
+                            <span className="font-sans font-medium text-brand-secondary group-hover:text-white transition-colors duration-150">
+                              (O-O-O)
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Black Castling Rights (Right Column) */}
+                      <div className="space-y-2 text-left">
+                        <div className="text-xs font-semibold text-brand-secondary font-sans uppercase tracking-wider">Black</div>
+                        <div className="flex flex-col gap-2 pl-1">
+                          <label className="flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none group">
+                            <input
+                              type="checkbox"
+                              checked={editorState.castlingRights.k}
+                              onChange={() => {
+                                setEditorState((current) => ({
+                                  ...current,
+                                  castlingRights: { ...current.castlingRights, k: !current.castlingRights.k }
+                                }));
+                                setLoadErrorMessage(null);
+                              }}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`relative flex items-center justify-center w-5 h-5 rounded-md border transition-all duration-200 ${editorState.castlingRights.k
+                                ? 'border-brand-accent bg-brand-accent text-white scale-100 shadow-[0_0_12px_rgba(99,102,241,0.45)]'
+                                : 'border-brand-border bg-brand-bg text-transparent group-hover:border-brand-accent/50'
+                                }`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`w-3.5 h-3.5 transition-all duration-200 transform ${editorState.castlingRights.k ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                                  }`}
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
+                            <span className="font-sans font-medium text-brand-secondary group-hover:text-white transition-colors duration-150">
+                              (O-O)
+                            </span>
+                          </label>
+                          <label className="flex items-center gap-2 text-sm text-white/90 cursor-pointer select-none group">
+                            <input
+                              type="checkbox"
+                              checked={editorState.castlingRights.q}
+                              onChange={() => {
+                                setEditorState((current) => ({
+                                  ...current,
+                                  castlingRights: { ...current.castlingRights, q: !current.castlingRights.q }
+                                }));
+                                setLoadErrorMessage(null);
+                              }}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`relative flex items-center justify-center w-5 h-5 rounded-md border transition-all duration-200 ${editorState.castlingRights.q
+                                ? 'border-brand-accent bg-brand-accent text-white scale-100 shadow-[0_0_12px_rgba(99,102,241,0.45)]'
+                                : 'border-brand-border bg-brand-bg text-transparent group-hover:border-brand-accent/50'
+                                }`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`w-3.5 h-3.5 transition-all duration-200 transform ${editorState.castlingRights.q ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                                  }`}
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
+                            <span className="font-sans font-medium text-brand-secondary group-hover:text-white transition-colors duration-150">
+                              (O-O-O)
+                            </span>
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="overflow-hidden rounded-xl border border-brand-border bg-brand-bg/50 p-2.5">
-                    <div
-                      className="break-words font-mono text-[11px] leading-4 text-white"
-                      style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {previewFen}
+                  {/* This was breaking the previewFen */}
+                  {/* <div className="overflow-hidden rounded-xl border border-brand-border bg-brand-bg/50 px-2.5 h-8 flex items-center">
+                    <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar flex items-center">
+                      <div className="font-mono text-[11px] leading-normal text-white whitespace-nowrap select-all">
+                        {previewFen}
+                      </div>
                     </div>
-                  </div>
+                  </div> */}
+                  {/* This Fixes It */}
+                  <div className="rounded-xl border border-brand-border bg-brand-bg/50 px-2"><input type="text" readOnly value={previewFen} onFocus={(e) => e.target.select()} className="w-full bg-transparent border-0 outline-none font-mono text-[11px] leading-5 text-white px-0 py-1" /></div>
 
                   <div className="rounded-xl border border-brand-border bg-brand-bg/50 p-2.5 space-y-2">
                     <button
@@ -323,7 +484,7 @@ export function EditPositionModal({
                     </button>
                   </div>
 
-                  <div className="flex items-end justify-end pt-0.5">
+                  <div className="flex items-end justify-end pt-0.5 mt-auto">
                     <button
                       onClick={handleLoad}
                       className="w-full rounded-lg bg-brand-accent px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-accent/90"

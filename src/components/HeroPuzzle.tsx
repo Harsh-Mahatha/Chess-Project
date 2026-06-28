@@ -46,7 +46,7 @@ import { useMoveAnnotation } from '../hooks/useMoveAnnotation';
 import { MoveAnnotation } from './MoveAnnotation';
 
 // ── Board theme ──────────────────────────────────────────────────────────────
-const BOARD_DARK  = '#769656';
+const BOARD_DARK = '#769656';
 const BOARD_LIGHT = '#EEEED2';
 
 // ── Puzzle definition (data-driven — swap to change puzzle) ──────────────────
@@ -57,13 +57,13 @@ const PUZZLE = {
   label: 'White to play and check mate in two',
   totalMoves: 2,
   blackResponse: { from: 'c7', to: 'd6' },
-  matingMove:    { from: 'd1', to: 'c1' },
+  matingMove: { from: 'd1', to: 'c1' },
   // King square to pulse on checkmate (black king)
   kingSquare: 'c8',
   solution: [
-    { from: 'h2', to: 'd6', san: 'Qd6',   annotation: 'Brilliant! The queen sacrifices herself on d6.', animate: true },
+    { from: 'h2', to: 'd6', san: 'Qd6', annotation: 'Brilliant! The queen sacrifices herself on d6.', animate: true },
     { from: 'c7', to: 'd6', san: '...cxd6', annotation: "Black is forced to capture.", animate: true },
-    { from: 'd1', to: 'c1', san: 'Rc1#',   annotation: '✓ Checkmate! The rook delivers the final blow.', animate: true },
+    { from: 'd1', to: 'c1', san: 'Rc1#', annotation: '✓ Checkmate! The rook delivers the final blow.', animate: true },
   ],
 } as const;
 
@@ -82,43 +82,43 @@ type CheckmateImpact = 'none' | 'flashing' | 'overlay' | 'done';
 
 export default function HeroPuzzle() {
   const { fireConfetti } = useConfetti();
-  const glowRef                       = useBoardCursorGlow<HTMLDivElement>();
+  const glowRef = useBoardCursorGlow<HTMLDivElement>();
   const { svgRef, showTrail, clearTrail } = useMoveTrail();
   const { activeAnnotation, triggerAnnotation, clearAnnotation } = useMoveAnnotation();
 
   // ── Chess state ────────────────────────────────────────────────────────────
   const gameRef = useRef(new Chess(PUZZLE.fen));
-  const [gameFen, setGameFen]         = useState<string>(PUZZLE.fen);
+  const [gameFen, setGameFen] = useState<string>(PUZZLE.fen);
 
   // ── Puzzle phase & counter ─────────────────────────────────────────────────
-  const [phase, setPhase]             = useState<PuzzlePhase>('idle');
-  const [movesLeft, setMovesLeft]     = useState<number>(PUZZLE.totalMoves);
+  const [phase, setPhase] = useState<PuzzlePhase>('idle');
+  const [movesLeft, setMovesLeft] = useState<number>(PUZZLE.totalMoves);
 
   // ── Last-move highlight ────────────────────────────────────────────────────
-  const [lastMove, setLastMove]       = useState<{ from: string; to: string } | null>(null);
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
 
   // ── Checkmate impact ───────────────────────────────────────────────────────
   const [, setCheckmateImpact] = useState<CheckmateImpact>('none');
-  const [kingPulse, setKingPulse]     = useState(false);
+  const [kingPulse, setKingPulse] = useState(false);
 
   // ── Solve animation ────────────────────────────────────────────────────────
-  const [, setSolveStep]         = useState(-1);
+  const [, setSolveStep] = useState(-1);
   const [solveAnnotation, setSolveAnnotation] = useState('');
-  const solveTimerRef                     = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const solveAbortRef                     = useRef(false);
+  const solveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const solveAbortRef = useRef(false);
 
   // ── Notation panel ─────────────────────────────────────────────────────────
   const [, setNotationEntries] = useState<string[]>([]);
-  const notationRef                       = useRef<HTMLDivElement>(null);
+  const notationRef = useRef<HTMLDivElement>(null);
 
   // ── Celebration guard ──────────────────────────────────────────────────────
   const hasCelebratedRef = useRef(false);
 
   // ── DOM refs ───────────────────────────────────────────────────────────────
-  const boardWrapRef    = useRef<HTMLDivElement>(null);   // outer glow target
-  const boardCardRef    = useRef<HTMLDivElement>(null);   // the dark card
-  const boardInnerRef   = useRef<HTMLDivElement>(null);   // board div (aspect-square)
-  const checkmateRef    = useRef<HTMLDivElement>(null);   // CHECKMATE overlay
+  const boardWrapRef = useRef<HTMLDivElement>(null);   // outer glow target
+  const boardCardRef = useRef<HTMLDivElement>(null);   // the dark card
+  const boardInnerRef = useRef<HTMLDivElement>(null);   // board div (aspect-square)
+  const checkmateRef = useRef<HTMLDivElement>(null);   // CHECKMATE overlay
 
   // ══════════════════════════════════════════════════════════════════════════
   // 1. BOARD ENTRANCE ANIMATION
@@ -129,7 +129,7 @@ export default function HeroPuzzle() {
     gsap.fromTo(
       boardCardRef.current,
       { opacity: 0, y: 18, scale: 0.97 },
-      { opacity: 1, y: 0,  scale: 1,   duration: 0.8, ease: 'power3.out', delay: 0.6 }
+      { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out', delay: 0.6 }
     );
   }, []);
 
@@ -150,7 +150,7 @@ export default function HeroPuzzle() {
       };
 
       const from = getSquareCenter(fromSq);
-      const to   = getSquareCenter(toSq);
+      const to = getSquareCenter(toSq);
       const pieceEl = boardEl.querySelector(
         `[data-square="${fromSq}"] [data-testid^="piece-"]`
       ) as HTMLElement | null;
@@ -171,8 +171,8 @@ export default function HeroPuzzle() {
       // Perpendicular arc offset for curved path
       const arcAmt = dist * 0.15;
       const perpX = dist > 0 ? (-dy / dist) * arcAmt : 0;
-      const perpY = dist > 0 ? ( dx / dist) * arcAmt : 0;
-      
+      const perpY = dist > 0 ? (dx / dist) * arcAmt : 0;
+
       const controlX = dx / 2 + perpX;
       const controlY = dy / 2 + perpY;
 
@@ -327,7 +327,7 @@ export default function HeroPuzzle() {
       if (prefersReducedMotion()) { resolve(); return; }
 
       const board = boardInnerRef.current;
-      const card  = boardCardRef.current;
+      const card = boardCardRef.current;
       const overlay = checkmateRef.current;
       if (!board || !card || !overlay) { resolve(); return; }
 
@@ -339,11 +339,11 @@ export default function HeroPuzzle() {
         duration: 0.08,
         ease: 'none',
       })
-      .to(board, {
-        filter: 'brightness(1)',
-        duration: 0.25,
-        ease: 'power2.out',
-      });
+        .to(board, {
+          filter: 'brightness(1)',
+          duration: 0.25,
+          ease: 'power2.out',
+        });
 
       // b) King square pulse (red tint — handled by state toggle + CSS)
       tl.call(() => {
@@ -410,8 +410,8 @@ export default function HeroPuzzle() {
       const ok = applyMove(sourceSquare, targetSquare);
       if (!ok) return false;
 
-      const game     = gameRef.current;
-      const history  = game.history({ verbose: true });
+      const game = gameRef.current;
+      const history = game.history({ verbose: true });
       const lastEntry = history[history.length - 1];
 
       if (phase === 'idle') {
@@ -439,7 +439,7 @@ export default function HeroPuzzle() {
           if (blackMove) {
             gameRef.current.move(blackMove);
             setGameFen(gameRef.current.fen());
-            
+
             const hist = gameRef.current.history({ verbose: true });
             const blackSan = hist[hist.length - 1].san.replace('x', '');
             addNotation(`   ...${blackSan}`);
@@ -462,7 +462,7 @@ export default function HeroPuzzle() {
             if (blackMove) {
               gameRef.current.move(blackMove);
               setGameFen(gameRef.current.fen());
-              
+
               const hist = gameRef.current.history({ verbose: true });
               const blackSan = hist[hist.length - 1].san.replace('x', '');
               addNotation(`   ...${blackSan}`);
@@ -633,20 +633,20 @@ export default function HeroPuzzle() {
 
     const onMouseMove = (e: MouseEvent) => {
       const piece = (e.target as HTMLElement).closest('[data-testid^="piece-"]') as HTMLElement | null;
-      
+
       if (piece) {
         if (activePiece && activePiece !== piece) {
           activePiece.style.setProperty('--mag-x', '0px');
           activePiece.style.setProperty('--mag-y', '0px');
         }
         activePiece = piece;
-        
+
         const rect = piece.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         const dx = e.clientX - cx;
         const dy = e.clientY - cy;
-        
+
         piece.style.setProperty('--mag-x', `${(dx * 0.25).toFixed(1)}px`);
         piece.style.setProperty('--mag-y', `${(dy * 0.25).toFixed(1)}px`);
       } else {
@@ -687,7 +687,7 @@ export default function HeroPuzzle() {
   // Last-move amber highlight
   if (lastMove) {
     customSquareStyles[lastMove.from] = { backgroundColor: 'rgba(255, 214, 10, 0.35)' };
-    customSquareStyles[lastMove.to]   = { backgroundColor: 'rgba(255, 214, 10, 0.50)' };
+    customSquareStyles[lastMove.to] = { backgroundColor: 'rgba(255, 214, 10, 0.50)' };
   }
 
   // King square pulse (red on checkmate)
@@ -701,13 +701,13 @@ export default function HeroPuzzle() {
 
   // ── Phase labels ───────────────────────────────────────────────────────────
   const phaseLabel: Record<PuzzlePhase, string> = {
-    idle:             'White to move',
-    white_moved:      'White moved',
+    idle: 'White to move',
+    white_moved: 'White moved',
     black_responding: 'Black thinking…',
-    awaiting_mate:    'Deliver checkmate!',
-    solved:           '✓ Puzzle Solved!',
-    failed:           'Not checkmate — try again',
-    solving:          'Watching solution…',
+    awaiting_mate: 'Deliver checkmate!',
+    solved: '✓ Puzzle Solved!',
+    failed: 'Not checkmate — try again',
+    solving: 'Watching solution…',
   };
 
   const isInteractive = phase === 'idle' || phase === 'awaiting_mate';
@@ -830,7 +830,7 @@ export default function HeroPuzzle() {
                 position: gameFen,
                 onPieceDrop: ({ sourceSquare, targetSquare }) =>
                   onDrop(sourceSquare, targetSquare ?? null),
-                darkSquareStyle:  { backgroundColor: BOARD_DARK },
+                darkSquareStyle: { backgroundColor: BOARD_DARK },
                 lightSquareStyle: { backgroundColor: BOARD_LIGHT },
                 boardStyle: {
                   borderRadius: '4px',
@@ -847,17 +847,17 @@ export default function HeroPuzzle() {
             <MoveAnnotation activeAnnotation={activeAnnotation} />
 
             {/* ── Engraved board coordinates ── */}
-            {/* File labels a–h: bottom-left of each file column */}
-            {['a','b','c','d','e','f','g','h'].map((file, i) => (
+            {/* File labels a–h: bottom-left of each file column's bottom square */}
+            {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((file, i) => (
               <span
                 key={`file-${file}`}
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  bottom: file === 'd' ? '2px' : '4px',
-                  left: file === 'd' ? `calc(${i * 12.5}% + 1px)` : `calc(${i * 12.5}% + 4px)`,
+                  bottom: '4px',
+                  left: `calc(${i * 12.5}% + 4px)`,
                   fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: file === 'd' ? '11px' : '13px',
+                  fontSize: '15px',
                   fontWeight: 700,
                   color: i % 2 === 0 ? '#67834b' : '#d0d0b7', // engraved: 12% darker than square
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
@@ -872,19 +872,19 @@ export default function HeroPuzzle() {
               </span>
             ))}
 
-            {/* Rank labels 8–1: top-left of each rank row */}
-            {['8','7','6','5','4','3','2','1'].map((rank, i) => (
+            {/* Rank labels 8–1: bottom-left of each rank row's leftmost square, offset vertically to prevent overlap */}
+            {['8', '7', '6', '5', '4', '3', '2', '1'].map((rank, i) => (
               <span
                 key={`rank-${rank}`}
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  top: `calc(${i * 12.5}% + 4px)`,
+                  bottom: `calc(${(7 - i) * 12.5}% + 20px)`,
                   left: '4px',
                   fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#d0d0b7' : '#67834b', // engraved: 12% darker than square
+                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // engraved: same color as square
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.92,
                   pointerEvents: 'none',
@@ -919,8 +919,8 @@ export default function HeroPuzzle() {
             ${phase === 'solved'
               ? 'bg-brand-accent/20 border-brand-accent/50 text-brand-accent'
               : phase === 'failed'
-              ? 'bg-red-500/10 border-red-500/30 text-red-400'
-              : 'bg-brand-surface border-brand-border text-white'}
+                ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                : 'bg-brand-surface border-brand-border text-white'}
           `}
         >
           <span className="text-xl font-mono font-bold leading-none">
