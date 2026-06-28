@@ -847,19 +847,19 @@ export default function HeroPuzzle() {
             <MoveAnnotation activeAnnotation={activeAnnotation} />
 
             {/* ── Engraved board coordinates ── */}
-            {/* File labels a–h: bottom-left of each file column */}
+            {/* File labels a–h: bottom-left of each file column's bottom square */}
             {['a','b','c','d','e','f','g','h'].map((file, i) => (
               <span
                 key={`file-${file}`}
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  bottom: file === 'd' ? '2px' : '4px',
-                  left: file === 'd' ? `calc(${i * 12.5}% + 1px)` : `calc(${i * 12.5}% + 4px)`,
+                  bottom: '4px',
+                  left: `calc(${i * 12.5}% + 4px)`,
                   fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: file === 'd' ? '11px' : '13px',
+                  fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#769656' : '#EEEED2', // engraved: same color as square
+                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // high-contrast: opposite of square color
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.9,
                   pointerEvents: 'none',
@@ -872,19 +872,19 @@ export default function HeroPuzzle() {
               </span>
             ))}
 
-            {/* Rank labels 8–1: top-left of each rank row */}
+            {/* Rank labels 8–1: bottom-left of each rank row's leftmost square, offset vertically to prevent overlap */}
             {['8','7','6','5','4','3','2','1'].map((rank, i) => (
               <span
                 key={`rank-${rank}`}
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  top: `calc(${i * 12.5}% + 4px)`,
+                  bottom: `calc(${(7 - i) * 12.5}% + 20px)`,
                   left: '4px',
                   fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // engraved: same color as square
+                  color: i % 2 === 0 ? '#769656' : '#EEEED2', // high-contrast: opposite of square color
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.9,
                   pointerEvents: 'none',

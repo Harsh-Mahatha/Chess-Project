@@ -317,9 +317,9 @@ export default function ProductDemo() {
   */
 
   // Switch Side — ONLY flips board orientation, never triggers engine move
-  // @ts-ignore
   const handleSwitchSide = useCallback(() => {
     setBoardOrientation((prev) => (prev === 'white' ? 'black' : 'white'));
+    setPlayerColor((prev) => (prev === 'w' ? 'b' : 'w'));
   }, []);
 
   // Move history — derived from the current game instance
@@ -624,6 +624,7 @@ export default function ProductDemo() {
         initialFen={gameFen}
         isOpen={isEditMode}
         boardOrientation={boardOrientation}
+        onSwitchSides={handleSwitchSide}
         onApply={handleApplyEditorPosition}
         onCancel={handleCancelEditor}
         onValidate={handleValidateEditorPosition}

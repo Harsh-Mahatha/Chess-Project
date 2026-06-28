@@ -142,7 +142,8 @@ export function EditPositionBoard({
     <div
       ref={boardFrameRef}
       className="relative aspect-square overflow-hidden rounded-xl border border-brand-border shadow-xl touch-none select-none"
-      style={boardSize ? { width: `${boardSize}px`, height: `${boardSize}px`, maxWidth: '100%' } : undefined}
+      onContextMenu={(event) => event.preventDefault()}
+      style={boardSize ? { width: `${boardSize}px`, height: `${boardSize}px`, maxWidth: '100%' } : {}}
     >
       <Chessboard
         options={{
@@ -168,9 +169,17 @@ export function EditPositionBoard({
                   }
 
                   if (selectedTool) {
-                    if (event.pointerType === 'mouse' && event.button !== 0) return;
+                    if (event.pointerType === 'mouse' && event.button !== 0 && event.button !== 2) return;
                     event.preventDefault();
-                    placeTool(square);
+
+                    if (event.button === 2 && selectedTool !== 'erase') {
+                      const color = selectedTool[0];
+                      const type = selectedTool.slice(1);
+                      const oppTool = (color === 'w' ? `b${type}` : `w${type}`) as EditorPieceCode;
+                      onPositionChange(setPieceOnSquare(position, square, oppTool));
+                    } else {
+                      placeTool(square);
+                    }
                   }
                 }}
                 onPointerCancel={(event) => endDrag(event, true)}
@@ -180,7 +189,12 @@ export function EditPositionBoard({
                   event.preventDefault();
                   placeTool(square);
                 }}
-                style={{ width: '100%', height: '100%', touchAction: 'none', userSelect: 'none' }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  touchAction: 'none',
+                  userSelect: 'none',
+                }}
               >
                 <div style={{ width: '100%', height: '100%', opacity: isDraggingSource ? 0 : 1 }}>
                   {children}
@@ -197,21 +211,37 @@ export function EditPositionBoard({
       />
 
       <div className="pointer-events-none absolute inset-0 z-10">
-        <div className="absolute bottom-1.5 left-2 right-2 grid grid-cols-8 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/28">
-          {fileLabels.map((file) => (
-            <span key={file} className="justify-self-center">
-              {file}
-            </span>
-          ))}
-        </div>
+        {/* File labels (a-h) inside the bottom-left corner of the bottom square in each column */}
+        {fileLabels.map((file, i) => (
+          <span
+            key={`file-${file}`}
+            className="absolute text-[12px] font-semibold"
+            style={{
+              bottom: '4px',
+              left: `calc(${i * 12.5}% + 4px)`,
+              color: i % 2 === 0 ? '#EEEED2' : '#769656',
+              lineHeight: 1,
+            }}
+          >
+            {file}
+          </span>
+        ))}
 
-        <div className="absolute left-1.5 top-2 bottom-2 grid grid-rows-8 text-[10px] font-semibold text-white/28">
-          {rankLabels.map((rank) => (
-            <span key={rank} className="self-center">
-              {rank}
-            </span>
-          ))}
-        </div>
+        {/* Rank labels (1-8) inside the bottom-left corner of the leftmost square in each row, offset vertically to prevent overlap with file labels */}
+        {rankLabels.map((rank, i) => (
+          <span
+            key={`rank-${rank}`}
+            className="absolute text-[12px] font-semibold"
+            style={{
+              bottom: `calc(${i * 12.5}% + 16px)`,
+              left: '4px',
+              color: i % 2 === 0 ? '#EEEED2' : '#769656',
+              lineHeight: 1,
+            }}
+          >
+            {rank}
+          </span>
+        ))}
       </div>
 
       {dragState && (
