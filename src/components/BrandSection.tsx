@@ -14,11 +14,10 @@ export default function BrandSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      if (!sectionRef.current || !imageRef.current || !textRef.current || !cardsRef.current) return;
+      if (!sectionRef.current || !imageRef.current || !textRef.current) return;
 
       // Text — fade right
       gsap.fromTo(
@@ -54,24 +53,7 @@ export default function BrandSection() {
           },
         }
       );
-      
-      // Cards - stagger up
-      gsap.fromTo(
-        cardsRef.current.children,
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: dur(0.8),
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
+
     },
     sectionRef,
     []
@@ -93,7 +75,7 @@ export default function BrandSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Top Banner Area */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 mb-24">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           
           {/* Left — Text Content */}
           <div
@@ -101,12 +83,6 @@ export default function BrandSection() {
             className="w-full lg:w-[55%] space-y-8 text-left"
             style={{ opacity: 0 }}
           >
-            {/* Top Pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-accent/30 bg-brand-accent/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-              <span className="font-sans font-bold text-xs tracking-[0.15em] text-brand-accent drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]">
-                FOR CREATORS WHO PLAY TO WIN
-              </span>
-            </div>
 
             <div className="space-y-4 max-w-xl">
               <h2 className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.05]">
@@ -158,50 +134,7 @@ export default function BrandSection() {
 
         </div>
 
-        {/* Bottom Feature Cards */}
-        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          
-          <div className="p-8 rounded-2xl bg-brand-surface/40 border border-white/5 backdrop-blur-sm shadow-xl hover:bg-brand-surface/60 transition-colors group">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 transition-colors">
-              <Sparkles className="w-6 h-6 text-indigo-400" />
-            </div>
-            <h3 className="font-sans font-bold text-white text-lg mb-3">Own Your Platform</h3>
-            <p className="font-sans text-brand-secondary text-sm leading-relaxed">
-              No algorithms.<br/>No limits.
-            </p>
-          </div>
 
-          <div className="p-8 rounded-2xl bg-brand-surface/40 border border-white/5 backdrop-blur-sm shadow-xl hover:bg-brand-surface/60 transition-colors group">
-            <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-6 group-hover:bg-violet-500/20 transition-colors">
-              <Users className="w-6 h-6 text-violet-400" />
-            </div>
-            <h3 className="font-sans font-bold text-white text-lg mb-3">Engage Your Community</h3>
-            <p className="font-sans text-brand-secondary text-sm leading-relaxed">
-              Tools to connect,<br/>interact and grow.
-            </p>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-brand-surface/40 border border-white/5 backdrop-blur-sm shadow-xl hover:bg-brand-surface/60 transition-colors group">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 transition-colors">
-              <DollarSign className="w-6 h-6 text-emerald-400" />
-            </div>
-            <h3 className="font-sans font-bold text-white text-lg mb-3">Monetize Your Brand</h3>
-            <p className="font-sans text-brand-secondary text-sm leading-relaxed">
-              Turn your audience<br/>into real revenue.
-            </p>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-brand-surface/40 border border-white/5 backdrop-blur-sm shadow-xl hover:bg-brand-surface/60 transition-colors group">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
-              <BarChart3 className="w-6 h-6 text-blue-400" />
-            </div>
-            <h3 className="font-sans font-bold text-white text-lg mb-3">Built to Scale</h3>
-            <p className="font-sans text-brand-secondary text-sm leading-relaxed">
-              All the analytics and<br/>insights you need.
-            </p>
-          </div>
-
-        </div>
 
       </div>
     </section>

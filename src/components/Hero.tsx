@@ -48,33 +48,15 @@ export default function Hero() {
 
   const primaryGlowRef = useButtonGlow<HTMLAnchorElement>();
 
-  // ── Tilt animation for Play button — subtle 3° cursor-driven tilt ───────────
-  // Identical mechanism to the logo tilt but dialled back for a CTA button:
-  //   · maxRotate  3° — barely-there, premium feel (logo uses 6°)
-  //   · scalePeak  1.0 — no zoom, keeps button size locked
-  //   · quickToDuration 0.2s — snappier than the logo (0.35s) per spec
-  //   · shadowStrength 1.6 — glow is slightly more vivid than resting state
-  //   · disableMobileFloat — button never bounces / pulses on touch devices
-  const playBtnTiltRef = usePerspectiveTilt<HTMLAnchorElement>({
-    maxRotate:         3,
-    scalePeak:         1.0,
-    quickToDuration:   0.2,
-    quickToEase:       'power2.out',
-    shadowStrength:    1.6,
-    disableMobileFloat: true,
-  });
-
   const ctaAnchorRef = useRef<HTMLAnchorElement>(null);
 
-  // Merge tilt ref + glow ref onto the same anchor element
+  // Merge glow ref onto the anchor element
   const mergedPlayRef = (el: HTMLAnchorElement | null) => {
     (primaryGlowRef as React.MutableRefObject<HTMLAnchorElement | null>).current = el;
-    (playBtnTiltRef as React.MutableRefObject<HTMLAnchorElement | null>).current = el;
     (ctaAnchorRef as React.MutableRefObject<HTMLAnchorElement | null>).current = el;
   };
 
-  useMagneticWiggle({ targetRef: heroLogoRef, containerRef: heroLogoContainerRef, magneticStrength: 0.35 });
-  useMagneticButton({ targetRef: ctaAnchorRef, containerRef: ctaRef, magneticStrength: 0.4 });
+  useMagneticButton({ targetRef: playIconRef, containerRef: ctaRef, magneticStrength: 0.4 });
 
   // ── GSAP entrance animations ───────────────────────────────────────────────
   useGSAP(
@@ -83,12 +65,7 @@ export default function Hero() {
 
       const tl = gsap.timeline({ defaults: { ease: ease.out } });
 
-      // ① Logo — fade down
-      tl.fromTo(
-        heroLogoContainerRef.current,
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: dur(0.6) }
-      );
+
 
       // ② Headline lines — staggered fade-up
       tl.fromTo(
@@ -162,15 +139,6 @@ export default function Hero() {
       }
 
       // ── Glow pulses (preserved) ──────────────────────────────────────────
-      if (heroLogoRef.current) {
-        gsap.to(heroLogoRef.current, {
-          filter: 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.5))',
-          duration: 2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        });
-      }
       if (playIconRef.current) {
         gsap.to(playIconRef.current, {
           filter: 'drop-shadow(0 0 10px rgba(99, 102, 241, 0.55))',
@@ -207,7 +175,7 @@ export default function Hero() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-end items-center">
 
           {/* ── Text Column ────────────────────────────────────────────────── */}
           <div className="lg:col-span-6 space-y-6 md:space-y-8 text-left">
@@ -216,7 +184,6 @@ export default function Hero() {
             <div
               ref={heroLogoContainerRef}
               className="flex items-center select-none"
-              style={{ opacity: 0 }}
             >
               <img
                 ref={heroLogoRef}
@@ -252,9 +219,7 @@ export default function Hero() {
               ref={subtitleRef}
               className="font-sans text-base sm:text-lg text-brand-secondary max-w-xl leading-relaxed"
               style={{ opacity: 0 }}
-            >
-              A creator-owned chess platform where you own the brand, community, and upside.
-            </p>
+            ></p>
 
             {/* CTA — Play Demo only */}
             <div
@@ -298,7 +263,7 @@ export default function Hero() {
                   }}
                   draggable={false}
                 />
-                <span className="ml-2 transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 max-w-[80px] group-hover:opacity-0 group-hover:max-w-0 group-hover:ml-0">Play</span>
+                <span className="ml-2 font-sans font-semibold text-[17px] opacity-100">Play</span>
               </a>
             </div>
           </div>

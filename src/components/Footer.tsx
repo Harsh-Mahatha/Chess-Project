@@ -34,8 +34,7 @@ export default function Footer() {
           <div className="flex items-center">
             <img
               src="/logo_cropped.png"
-              alt="XLChess logo"
-              className="h-[52px] sm:h-[62px] w-auto object-contain"
+              className="h-[104px] sm:h-[124px] w-auto object-contain"
               style={{ display: 'block' }}
               draggable={false}
             />

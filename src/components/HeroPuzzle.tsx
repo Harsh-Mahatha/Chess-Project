@@ -813,7 +813,7 @@ export default function HeroPuzzle() {
           */}
           <div
             ref={boardInnerRef}
-            className="aspect-square rounded-lg overflow-hidden relative"
+            className="aspect-square rounded-md overflow-hidden relative"
             style={{ willChange: 'filter', transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
           >
             {/* ── Move trail SVG overlay (pointer-events:none — never blocks) ── */}
@@ -847,19 +847,20 @@ export default function HeroPuzzle() {
             <MoveAnnotation activeAnnotation={activeAnnotation} />
 
             {/* ── Engraved board coordinates ── */}
-            {/* File labels a–h: bottom-left of each file column (left: calc(i*12.5% + 4px), bottom: 4px) */}
+            {/* File labels a–h: bottom-left of each file column */}
             {['a','b','c','d','e','f','g','h'].map((file, i) => (
               <span
                 key={`file-${file}`}
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  bottom: '4px',
-                  left: `calc(${i * 12.5}% + 4px)`,
+                  bottom: file === 'd' ? '2px' : '4px',
+                  left: file === 'd' ? `calc(${i * 12.5}% + 1px)` : `calc(${i * 12.5}% + 4px)`,
                   fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: '13px',
+                  fontSize: file === 'd' ? '11px' : '13px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // a1 is dark -> text light
+                  color: i % 2 === 0 ? '#769656' : '#EEEED2', // engraved: same color as square
+                  textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.9,
                   pointerEvents: 'none',
                   userSelect: 'none',
@@ -871,7 +872,7 @@ export default function HeroPuzzle() {
               </span>
             ))}
 
-            {/* Rank labels 8–1: top-left of each rank row (top: calc(i*12.5% + 4px), left: 4px) */}
+            {/* Rank labels 8–1: top-left of each rank row */}
             {['8','7','6','5','4','3','2','1'].map((rank, i) => (
               <span
                 key={`rank-${rank}`}
@@ -883,7 +884,8 @@ export default function HeroPuzzle() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '13px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#769656' : '#EEEED2', // a8 is light -> text dark
+                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // engraved: same color as square
+                  textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.9,
                   pointerEvents: 'none',
                   userSelect: 'none',
