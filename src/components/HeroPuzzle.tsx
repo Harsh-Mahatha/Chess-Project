@@ -854,8 +854,8 @@ export default function HeroPuzzle() {
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  bottom: '4px',
-                  left: `calc(${i * 12.5}% + 4px)`,
+                  bottom: '2px',
+                  left: `calc(${i * 12.5}% + 2px)`,
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
@@ -879,8 +879,8 @@ export default function HeroPuzzle() {
                 aria-hidden="true"
                 style={{
                   position: 'absolute',
-                  bottom: `calc(${(7 - i) * 12.5}% + 20px)`,
-                  left: '4px',
+                  top: `calc(${i * 12.5}% + 2px)`,
+                  left: '2px',
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
