@@ -813,7 +813,7 @@ export default function HeroPuzzle() {
           */}
           <div
             ref={boardInnerRef}
-            className="aspect-square rounded-md overflow-hidden relative"
+            className="aspect-square overflow-hidden relative"
             style={{ willChange: 'filter', transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
           >
             {/* ── Move trail SVG overlay (pointer-events:none — never blocks) ── */}
@@ -833,7 +833,7 @@ export default function HeroPuzzle() {
                 darkSquareStyle: { backgroundColor: BOARD_DARK },
                 lightSquareStyle: { backgroundColor: BOARD_LIGHT },
                 boardStyle: {
-                  borderRadius: '4px',
+                  borderRadius: '0px',
                   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
                 },
                 showNotation: false,
@@ -859,7 +859,7 @@ export default function HeroPuzzle() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#67834b' : '#d0d0b7', // engraved: 12% darker than square
+                  color: i % 2 === 0 ? '#5e7a44' : '#c8c8a6', // engraved: slightly darker than square
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.92,
                   pointerEvents: 'none',
@@ -884,7 +884,7 @@ export default function HeroPuzzle() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#EEEED2' : '#769656', // engraved: same color as square
+                  color: i % 2 === 0 ? '#c8c8a6' : '#5e7a44', // engraved: slightly darker than square
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.92,
                   pointerEvents: 'none',
@@ -901,7 +901,7 @@ export default function HeroPuzzle() {
       </div>{/* end board-cursor-glow */}
 
       {/* ── Below-board label: White to play + moves counter ──────────────── */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-0">
         <div>
           <p className="text-xs text-brand-secondary font-sans font-medium uppercase tracking-wider">
             {PUZZLE.label}

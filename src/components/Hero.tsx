@@ -187,7 +187,7 @@ export default function Hero() {
             >
               <img
                 ref={heroLogoRef}
-                src="/logo_cropped.png"
+                src="/final%20logo.png"
                 alt="XLChess logo"
                 className="object-contain"
                 style={{
@@ -204,22 +204,29 @@ export default function Hero() {
             <h1 className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.1] md:leading-[1.05]">
               {/* Each span is a separate animation target */}
               <span ref={line1Ref} className="block" style={{ opacity: 0 }}>
-                Build the Chess Platform
+                Build the Future of
               </span>
               <span
                 ref={line2Ref}
                 className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-accent via-indigo-400 to-violet-400"
                 style={{ opacity: 0 }}
               >
-                Your Audience Deserves
+                Online Chess
               </span>
             </h1>
 
-            <p
+            <div
               ref={subtitleRef}
-              className="font-sans text-base sm:text-lg text-brand-secondary max-w-xl leading-relaxed"
+              className="font-sans max-w-xl leading-relaxed space-y-3"
               style={{ opacity: 0 }}
-            ></p>
+            >
+              <p className="text-xl sm:text-2xl font-medium text-white/90">
+                Making the Best Move on the Way to the Top.
+              </p>
+              <p className="text-base sm:text-lg text-brand-secondary">
+                A complete chess platform to play, learn, compete, and grow—built to become the world's #1 destination for chess.
+              </p>
+            </div>
 
             {/* CTA — Play Demo only */}
             <div

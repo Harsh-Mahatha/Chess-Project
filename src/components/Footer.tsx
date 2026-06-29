@@ -31,9 +31,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
           {/* Brand Signature — static logo, no animation, no hover */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-3 select-none">
             <img
-              src="/logo_cropped.png"
+              src="/final%20logo.png"
+              alt="XLChess logo"
               className="h-[104px] sm:h-[124px] w-auto object-contain"
               style={{ display: 'block' }}
               draggable={false}

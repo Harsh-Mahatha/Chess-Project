@@ -60,7 +60,7 @@ export default function Navbar() {
           >
             <img
               ref={logoRef}
-              src="/logo.png"
+              src="/final%20logo.png"
               alt="XLChess logo"
               className="h-[68px] sm:h-[80px] w-auto object-contain"
               style={{
