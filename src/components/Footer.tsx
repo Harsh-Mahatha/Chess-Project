@@ -24,7 +24,7 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="py-6 md:py-8"
+      className="py-4 md:py-6"
       style={{ opacity: 0, backgroundColor: '#0F1D4D' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,7 +35,7 @@ export default function Footer() {
             <img
               src="/final%20logo.png"
               alt="XLChess logo"
-              className="h-[104px] sm:h-[124px] w-auto object-contain"
+              className="h-[72px] sm:h-[86px] w-auto object-contain"
               style={{ display: 'block' }}
               draggable={false}
             />

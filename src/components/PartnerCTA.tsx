@@ -104,11 +104,6 @@ export default function ContactSection() {
         .contact-page-bg {
           position: absolute;
           inset: 0;
-          background:
-            radial-gradient(circle at 18% 20%, rgba(123, 109, 255, 0.22), transparent 28%),
-            radial-gradient(circle at 80% 15%, rgba(137, 194, 255, 0.12), transparent 24%),
-            radial-gradient(circle at 50% 80%, rgba(110, 99, 246, 0.18), transparent 32%),
-            #0a0f24;
           z-index: -2;
         }
 
@@ -127,7 +122,8 @@ export default function ContactSection() {
 
         .contact-card {
           position: relative;
-          width: min(1056px, 100%);
+          width: 100%;
+          max-width: 1024px;
           padding: 84px 96px 72px;
           overflow: hidden;
           border-radius: 24px;
@@ -374,7 +370,7 @@ export default function ContactSection() {
 
               <div className="field font-sans">
                 <label htmlFor="contact-email" className="contact-label">
-                  Email <span>*</span>
+                  Email
                 </label>
                 <input
                   type="email"
@@ -395,7 +391,7 @@ export default function ContactSection() {
 
               <div className="field font-sans">
                 <label htmlFor="contact-message" className="contact-label">
-                  Message <span>*</span>
+                  Message
                 </label>
                 <textarea
                   id="contact-message"
@@ -432,7 +428,7 @@ export default function ContactSection() {
                   </>
                 ) : (
                   <>
-                    Send Message <span className="arrow font-sans">→</span>
+                    Send Message <span className="arrow font-sans font-black text-xl">→</span>
                   </>
                 )}
               </button>

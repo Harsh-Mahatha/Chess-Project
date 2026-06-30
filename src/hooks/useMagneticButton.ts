@@ -23,9 +23,18 @@ export function useMagneticButton<T extends HTMLElement, C extends HTMLElement>(
       const x = gsap.utils.mapRange(rect.left, rect.right, -rect.width / 2, rect.width / 2, e.clientX);
       const y = gsap.utils.mapRange(rect.top, rect.bottom, -rect.height / 2, rect.height / 2, e.clientY);
       
+      let moveX = x * magneticStrength;
+      let moveY = y * magneticStrength;
+
+      const maxMoveX = Math.max(0, (rect.width - target.offsetWidth) / 2 - 2);
+      const maxMoveY = Math.max(0, (rect.height - target.offsetHeight) / 2 - 2);
+
+      moveX = gsap.utils.clamp(-maxMoveX, maxMoveX, moveX);
+      moveY = gsap.utils.clamp(-maxMoveY, maxMoveY, moveY);
+
       gsap.to(target, {
-        x: x * magneticStrength,
-        y: y * magneticStrength,
+        x: moveX,
+        y: moveY,
         duration: 0.4,
         ease: 'power2.out',
         overwrite: true,

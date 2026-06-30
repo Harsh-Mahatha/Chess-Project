@@ -56,7 +56,7 @@ export default function Hero() {
     (ctaAnchorRef as React.MutableRefObject<HTMLAnchorElement | null>).current = el;
   };
 
-  useMagneticButton({ targetRef: playIconRef, containerRef: ctaRef, magneticStrength: 0.4 });
+  useMagneticButton({ targetRef: playIconRef, containerRef: ctaAnchorRef, magneticStrength: 0.4 });
 
   // ── GSAP entrance animations ───────────────────────────────────────────────
   useGSAP(
@@ -156,7 +156,7 @@ export default function Hero() {
   return (
     <header
       ref={heroRef}
-      className="relative pt-16 pb-16 md:pt-24 md:pb-28 overflow-hidden bg-brand-bg"
+      className="relative pt-16 pb-16 md:pt-24 md:pb-28 overflow-hidden"
       id="hero-section"
     >
       {/* ── Background glow orbs (CSS animated — GPU composited) ─────────── */}
@@ -270,7 +270,7 @@ export default function Hero() {
                   }}
                   draggable={false}
                 />
-                <span className="ml-2 font-sans font-semibold text-[17px] opacity-100">Play</span>
+                <span className="ml-2 font-sans font-semibold text-[17px] opacity-100 group-hover:hidden">Play</span>
               </a>
             </div>
           </div>
@@ -312,7 +312,7 @@ export default function Hero() {
                 - board glow animation
               */}
               <div
-                className="bg-brand-surface border border-brand-border rounded-xl shadow-2xl overflow-hidden hero-board-card"
+                className="bg-brand-surface border border-brand-border rounded-none shadow-2xl overflow-hidden hero-board-card"
                 style={{ transformStyle: 'preserve-3d' }}
               >
                 {/* Board Area */}

@@ -31,7 +31,7 @@ function App() {
         <div id="smooth-content">
 
         {/* Landing Page Content */}
-        <div className="min-h-screen bg-brand-bg text-brand-text flex flex-col selection:bg-brand-accent selection:text-white">
+        <div className="min-h-screen text-brand-text flex flex-col selection:bg-brand-accent selection:text-white">
           <main className="flex-1">
 
             {/* Section 1: Hero Visual and Brand Statement */}

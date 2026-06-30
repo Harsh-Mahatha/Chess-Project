@@ -63,7 +63,7 @@ export default function BrandSection() {
     <section
       ref={sectionRef}
       id="brand-section"
-      className="relative py-20 md:py-32 overflow-hidden bg-brand-bg"
+      className="relative py-20 md:py-32 overflow-hidden"
     >
       {/* Soft blue ambient glow */}
       <div

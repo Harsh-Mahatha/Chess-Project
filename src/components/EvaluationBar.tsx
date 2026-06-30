@@ -30,7 +30,7 @@ export function EvaluationBar({ evaluation, isDesktop, boardHeight }: Evaluation
 
   return (
     <div
-      className={isDesktop ? "flex flex-col items-center justify-center gap-2" : "flex flex-row items-center justify-center gap-2 w-full"}
+      className={isDesktop ? "flex flex-col items-center justify-center gap-0" : "flex flex-row items-center justify-center gap-2 w-full"}
       style={{ alignSelf: 'stretch', padding: '0' }}
     >
       <div
@@ -54,12 +54,11 @@ export function EvaluationBar({ evaluation, isDesktop, boardHeight }: Evaluation
           }}
         />
       </div>
-      <div className="flex justify-center pointer-events-none">
+      <div className={`flex justify-center pointer-events-none ${isDesktop ? 'mt-3' : ''}`}>
         <span
-          className="font-mono font-semibold text-sm sm:text-base px-2 py-1 shadow-sm leading-none rounded-md"
+          className="font-mono font-semibold text-sm sm:text-base leading-none"
           style={{
-            backgroundColor: '#ffffff',
-            color: '#111827',
+            color: '#F8FAFC',
           }}
         >
           {evalLabel}

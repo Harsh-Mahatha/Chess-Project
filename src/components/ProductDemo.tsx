@@ -357,7 +357,7 @@ export default function ProductDemo() {
   const canUndo = history.length > 0 && !gameOverReason;
 
   return (
-    <section id="interactive-demo" className="py-12 md:py-16 bg-brand-bg relative overflow-hidden">
+    <section id="interactive-demo" className="py-12 md:py-16 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

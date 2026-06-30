@@ -15,7 +15,11 @@
     and produces two scrollbars at the right edge of the viewport.
 */
 html {
-  background-color: #081532;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(123, 109, 255, 0.22), transparent 28%),
+    radial-gradient(circle at 80% 15%, rgba(137, 194, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 50% 80%, rgba(110, 99, 246, 0.18), transparent 32%),
+    #0a0f24;
   color: #F8FAFC;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;

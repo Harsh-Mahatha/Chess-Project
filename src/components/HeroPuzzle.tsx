@@ -1233,7 +1233,7 @@ export default function HeroPuzzle() {
       {/* ── Outer Wrapper: cursor glow + entrance animation ── */}
       <div
         ref={mergedWrapRef}
-        className="relative rounded-xl overflow-hidden board-cursor-glow"
+        className="relative rounded-none overflow-hidden board-cursor-glow"
         style={{
           transition: 'box-shadow 0.4s ease',
           boxShadow: isCheckmateGlow
@@ -1384,7 +1384,7 @@ export default function HeroPuzzle() {
         </div>
         <div
           className={`
-            flex flex-col items-center px-4 py-2 rounded-xl border
+            flex flex-col items-center px-4 py-1 rounded-xl border
             transition-all duration-500
             \${phase === 'SUCCESS'
               ? 'bg-brand-accent/20 border-brand-accent/50 text-brand-accent shadow-lg shadow-brand-accent/15'
