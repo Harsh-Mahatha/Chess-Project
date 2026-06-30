@@ -30,7 +30,7 @@ export function EvaluationBar({ evaluation, isDesktop, boardHeight }: Evaluation
 
   return (
     <div
-      className={isDesktop ? "flex flex-col items-center justify-center gap-0" : "flex flex-row items-center justify-center gap-2 w-full"}
+      className={isDesktop ? "flex flex-col items-center justify-start gap-0 h-full" : "flex flex-row items-center justify-center gap-2 w-full"}
       style={{ alignSelf: 'stretch', padding: '0' }}
     >
       <div

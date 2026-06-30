@@ -72,7 +72,6 @@ export default function ProductDemo() {
 
   // ── Layout measurements for exact sizing alignment ───────────────────────
   const [boardHeight, setBoardHeight] = useState<number>(0);
-  const [controlsHeight, setControlsHeight] = useState<number>(0);
   const [isDesktop, setIsDesktop] = useState<boolean>(false);
   // Progressive eval stabilization — separate displayed eval from raw eval
   // Start at 0.0 (never -0.0) for initial position
@@ -80,15 +79,11 @@ export default function ProductDemo() {
   const evalTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const boardContainerRef = useRef<HTMLDivElement>(null);
-  const controlsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const measure = () => {
       if (boardContainerRef.current) {
         setBoardHeight(boardContainerRef.current.getBoundingClientRect().height);
-      }
-      if (controlsRef.current) {
-        setControlsHeight(controlsRef.current.getBoundingClientRect().height);
       }
       setIsDesktop(window.innerWidth >= 1024);
     };
@@ -101,9 +96,6 @@ export default function ProductDemo() {
 
     if (boardContainerRef.current) {
       resizeObserver.observe(boardContainerRef.current);
-    }
-    if (controlsRef.current) {
-      resizeObserver.observe(controlsRef.current);
     }
 
     window.addEventListener('resize', measure);
@@ -372,14 +364,14 @@ export default function ProductDemo() {
 
             {/* ── Col 1: Eval Bar ──────────────────────────────────── */}
             <div
-              className="lg:col-span-1 flex lg:flex-col items-center justify-center gap-0"
+              className="lg:col-span-1 flex lg:flex-col items-center lg:justify-start justify-center gap-0"
               style={{ alignSelf: 'stretch', padding: '0' }}
             >
               <EvaluationBar evaluation={displayEval} isDesktop={isDesktop} boardHeight={boardHeight} />
             </div>
 
             {/* ── Col 2: Chessboard ────────────────────────────────────────── */}
-            <div className="lg:col-span-7 flex flex-col justify-center">
+            <div className="lg:col-span-7 flex flex-col lg:justify-start justify-center">
               <div ref={boardContainerRef} className="aspect-square w-full shadow-xl border border-brand-border relative overflow-hidden" style={{ borderRadius: '4px' }}>
 
                 {/* Game Over Overlay */}
@@ -449,9 +441,14 @@ export default function ProductDemo() {
             </div>
 
             {/* ── Col 3: Control Panel ─────────────────────────────────────── */}
-            <div className="lg:col-span-4 flex flex-col gap-10 lg:self-stretch">
+            <div
+              className="lg:col-span-4 flex flex-col lg:gap-6 gap-10 lg:self-stretch"
+              style={{
+                height: isDesktop && boardHeight ? `${boardHeight}px` : undefined
+              }}
+            >
 
-              <div ref={controlsRef} className="flex flex-col gap-8">
+              <div className="flex flex-col gap-8">
                 {/* ── Toolbar ───────────────────────────────────── */}
                 <div className="grid grid-cols-4 gap-2">
 
@@ -583,11 +580,9 @@ export default function ProductDemo() {
 
               {/* ── Move History ──────────────────────────────────────────── */}
               <div
-                className="flex flex-col text-left"
+                className={`flex flex-col text-left ${isDesktop ? 'flex-1 min-h-0' : ''}`}
                 style={{
-                  height: isDesktop && boardHeight && controlsHeight
-                    ? `${Math.max(120, boardHeight - controlsHeight - 20)}px`
-                    : '220px'
+                  height: isDesktop ? undefined : '220px'
                 }}
               >
                 <div
