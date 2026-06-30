@@ -45,14 +45,18 @@ import { prefersReducedMotion } from '../utils/gsapConfig';
 import { useMoveAnnotation } from '../hooks/useMoveAnnotation';
 import { MoveAnnotation } from './MoveAnnotation';
 
-// ── Board theme ──────────────────────────────────────────────────────────────
+// ============================================================================
+// ORIGINAL HERO PUZZLE IMPLEMENTATION (COMMENTED OUT AS REQUESTED)
+// ============================================================================
+/*
+// -- Board theme --------------------------------------------------------------
 const BOARD_DARK = '#769656';
 const BOARD_LIGHT = '#EEEED2';
 
-// ── Puzzle definition (data-driven — swap to change puzzle) ──────────────────
+// -- Puzzle definition (data-driven -- swap to change puzzle) ------------------
 const PUZZLE = {
   // Position: White Ka7 Qh2 Rd1 | Black Kc8 Rd8 Pc7 Pd7 | White to move
-  // Generated via chess.js load() from hardcoded FEN — NOT derived from move history
+  // Generated via chess.js load() from hardcoded FEN -- NOT derived from move history
   fen: '2kr4/K1pp4/8/8/8/8/7Q/3R4 w - - 0 1',
   label: 'White to play and check mate in two',
   totalMoves: 2,
@@ -63,11 +67,11 @@ const PUZZLE = {
   solution: [
     { from: 'h2', to: 'd6', san: 'Qd6', annotation: 'Brilliant! The queen sacrifices herself on d6.', animate: true },
     { from: 'c7', to: 'd6', san: '...cxd6', annotation: "Black is forced to capture.", animate: true },
-    { from: 'd1', to: 'c1', san: 'Rc1#', annotation: '✓ Checkmate! The rook delivers the final blow.', animate: true },
+    { from: 'd1', to: 'c1', san: 'Rc1#', annotation: 'v Checkmate! The rook delivers the final blow.', animate: true },
   ],
 } as const;
 
-// ── Puzzle state machine ─────────────────────────────────────────────────────
+// -- Puzzle state machine -----------------------------------------------------
 type PuzzlePhase =
   | 'idle'
   | 'white_moved'
@@ -77,53 +81,53 @@ type PuzzlePhase =
   | 'failed'
   | 'solving';
 
-// ── Checkmate impact layer state ─────────────────────────────────────────────
+// -- Checkmate impact layer state ---------------------------------------------
 type CheckmateImpact = 'none' | 'flashing' | 'overlay' | 'done';
 
-export default function HeroPuzzle() {
+export function OriginalHeroPuzzle() {
   const { fireConfetti } = useConfetti();
   const glowRef = useBoardCursorGlow<HTMLDivElement>();
   const { svgRef, showTrail, clearTrail } = useMoveTrail();
   const { activeAnnotation, triggerAnnotation, clearAnnotation } = useMoveAnnotation();
 
-  // ── Chess state ────────────────────────────────────────────────────────────
+  // -- Chess state ------------------------------------------------------------
   const gameRef = useRef(new Chess(PUZZLE.fen));
   const [gameFen, setGameFen] = useState<string>(PUZZLE.fen);
 
-  // ── Puzzle phase & counter ─────────────────────────────────────────────────
+  // -- Puzzle phase & counter -------------------------------------------------
   const [phase, setPhase] = useState<PuzzlePhase>('idle');
   const [movesLeft, setMovesLeft] = useState<number>(PUZZLE.totalMoves);
 
-  // ── Last-move highlight ────────────────────────────────────────────────────
+  // -- Last-move highlight ----------------------------------------------------
   const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
 
-  // ── Checkmate impact ───────────────────────────────────────────────────────
+  // -- Checkmate impact -------------------------------------------------------
   const [, setCheckmateImpact] = useState<CheckmateImpact>('none');
   const [kingPulse, setKingPulse] = useState(false);
 
-  // ── Solve animation ────────────────────────────────────────────────────────
+  // -- Solve animation --------------------------------------------------------
   const [, setSolveStep] = useState(-1);
   const [solveAnnotation, setSolveAnnotation] = useState('');
   const solveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const solveAbortRef = useRef(false);
 
-  // ── Notation panel ─────────────────────────────────────────────────────────
+  // -- Notation panel ---------------------------------------------------------
   const [, setNotationEntries] = useState<string[]>([]);
   const notationRef = useRef<HTMLDivElement>(null);
 
-  // ── Celebration guard ──────────────────────────────────────────────────────
+  // -- Celebration guard ------------------------------------------------------
   const hasCelebratedRef = useRef(false);
 
-  // ── DOM refs ───────────────────────────────────────────────────────────────
+  // -- DOM refs ---------------------------------------------------------------
   const boardWrapRef = useRef<HTMLDivElement>(null);   // outer glow target
   const boardCardRef = useRef<HTMLDivElement>(null);   // the dark card
   const boardInnerRef = useRef<HTMLDivElement>(null);   // board div (aspect-square)
   const checkmateRef = useRef<HTMLDivElement>(null);   // CHECKMATE overlay
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // ==========================================================================
   // 1. BOARD ENTRANCE ANIMATION
-  // Runs once on mount — smooth scale+fade from slightly below.
-  // ══════════════════════════════════════════════════════════════════════════
+  // Runs once on mount -- smooth scale+fade from slightly below.
+  // ==========================================================================
   useLayoutEffect(() => {
     if (prefersReducedMotion() || !boardCardRef.current) return;
     gsap.fromTo(
@@ -185,10 +189,10 @@ export default function HeroPuzzle() {
       ghost.classList.add('gsap-moving');
       ghost.style.cssText = `
         position:absolute; pointer-events:none; z-index:15;
-        left:${from.x - pieceEl.offsetWidth / 2}px;
-        top:${from.y - pieceEl.offsetHeight / 2}px;
-        width:${pieceEl.offsetWidth}px;
-        height:${pieceEl.offsetHeight}px;
+        left:\${from.x - pieceEl.offsetWidth / 2}px;
+        top:\${from.y - pieceEl.offsetHeight / 2}px;
+        width:\${pieceEl.offsetWidth}px;
+        height:\${pieceEl.offsetHeight}px;
         opacity:0.25; filter:blur(1px); transform:none;
       `;
       boardEl.appendChild(ghost);
@@ -202,7 +206,7 @@ export default function HeroPuzzle() {
         },
       });
 
-      // 1) Scale up 1 → 1.08 immediately
+      // 1) Scale up 1 -> 1.08 immediately
       tl.to(pieceEl, {
         scale: 1.08,
         duration: 0.08,
@@ -262,11 +266,6 @@ export default function HeroPuzzle() {
     });
   }, []);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // HELPERS
-  // ══════════════════════════════════════════════════════════════════════════
-
-  /** Apply a chess move; update FEN + last-move state. Returns success bool. */
   const applyMove = useCallback(
     (from: string, to: string, promotion = 'q'): boolean => {
       try {
@@ -283,7 +282,6 @@ export default function HeroPuzzle() {
     [showTrail]
   );
 
-  /** Scroll notation panel to bottom */
   const addNotation = useCallback((entry: string) => {
     setNotationEntries(prev => [...prev, entry]);
     setTimeout(() => {
@@ -292,20 +290,14 @@ export default function HeroPuzzle() {
     }, 50);
   }, []);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // SHARED: Pick a random Black move that preserves White's mate-in-one.
-  // Used by BOTH manual play and autosolve — single code path.
-  // ══════════════════════════════════════════════════════════════════════════
   const pickSafeBlackMove = useCallback((): string | null => {
     const game = gameRef.current;
     const legalMoves = game.moves();
     if (legalMoves.length === 0) return null;
 
-    // Filter: only keep moves where White can still mate in one afterwards
     const safeMoves = legalMoves.filter((move) => {
       const probe = new Chess(game.fen());
       probe.move(move);
-      // After Black's move, check if ANY White reply is checkmate
       const whiteReplies = probe.moves();
       return whiteReplies.some((wr) => {
         const probe2 = new Chess(probe.fen());
@@ -318,10 +310,6 @@ export default function HeroPuzzle() {
     return pool[Math.floor(Math.random() * pool.length)];
   }, []);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // 6. CHECKMATE IMPACT SEQUENCE
-  // a) Board white flash  b) King pulse  c) CHECKMATE overlay  d) Glow ring
-  // ══════════════════════════════════════════════════════════════════════════
   const runCheckmateImpact = useCallback((): Promise<void> => {
     return new Promise(resolve => {
       if (prefersReducedMotion()) { resolve(); return; }
@@ -333,7 +321,6 @@ export default function HeroPuzzle() {
 
       const tl = gsap.timeline({ onComplete: resolve });
 
-      // a) Flash: board briefly goes bright white then snaps back
       tl.to(board, {
         filter: 'brightness(3)',
         duration: 0.08,
@@ -345,13 +332,11 @@ export default function HeroPuzzle() {
           ease: 'power2.out',
         });
 
-      // b) King square pulse (red tint — handled by state toggle + CSS)
       tl.call(() => {
         setKingPulse(true);
         setTimeout(() => setKingPulse(false), 1200);
       }, [], '<0.05');
 
-      // c) CHECKMATE text overlay — scale in from 0
       tl.set(overlay, { display: 'flex', opacity: 0, scale: 0.6 })
         .to(overlay, {
           opacity: 1,
@@ -360,7 +345,6 @@ export default function HeroPuzzle() {
           ease: 'back.out(1.7)',
         }, '+=0.1');
 
-      // d) Glow expansion ring
       tl.fromTo(card,
         { boxShadow: '0 0 0px 0px rgba(99,102,241,0)' },
         {
@@ -381,7 +365,6 @@ export default function HeroPuzzle() {
     });
   }, []);
 
-  /** Full celebration: checkmate impact → confetti → solved state */
   const celebrate = useCallback(async () => {
     if (hasCelebratedRef.current) return;
     hasCelebratedRef.current = true;
@@ -390,7 +373,6 @@ export default function HeroPuzzle() {
     await runCheckmateImpact();
     setCheckmateImpact('overlay');
 
-    // Brief hold on the CHECKMATE text, then transition to puzzle-solved state
     await new Promise(r => setTimeout(r, 900));
     fireConfetti();
     setCheckmateImpact('done');
@@ -398,9 +380,6 @@ export default function HeroPuzzle() {
     setMovesLeft(0);
   }, [runCheckmateImpact, fireConfetti]);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // onDrop — user drags a piece
-  // ══════════════════════════════════════════════════════════════════════════
   const onDrop = useCallback(
     (sourceSquare: string, targetSquare: string | null): boolean => {
       if (!targetSquare) return false;
@@ -415,11 +394,9 @@ export default function HeroPuzzle() {
       const lastEntry = history[history.length - 1];
 
       if (phase === 'idle') {
-        // White's first move — strip capture 'x' for clean display
         const displaySan = lastEntry.san.replace('x', '');
-        addNotation(`1. ${displaySan}`);
+        addNotation(`1. \${displaySan}`);
 
-        // Check if this move is already checkmate (e.g., Qb7# or Rd8#)
         if (game.isCheckmate()) {
           setMovesLeft(0);
           triggerAnnotation(targetSquare, '!!');
@@ -429,11 +406,8 @@ export default function HeroPuzzle() {
 
         setMovesLeft(1);
         setPhase('black_responding');
-
-        // Show White first move annotation !!
         triggerAnnotation(targetSquare, '!!');
 
-        // Black auto-responds after 600ms with a safe random legal move
         setTimeout(() => {
           const blackMove = pickSafeBlackMove();
           if (blackMove) {
@@ -442,20 +416,17 @@ export default function HeroPuzzle() {
 
             const hist = gameRef.current.history({ verbose: true });
             const blackSan = hist[hist.length - 1].san.replace('x', '');
-            addNotation(`   ...${blackSan}`);
+            addNotation(`   ...\${blackSan}`);
           }
           setPhase('awaiting_mate');
         }, 600);
 
       } else if (phase === 'awaiting_mate') {
-        // White's second move — strip capture 'x' for clean display
         const displaySan = lastEntry.san.replace('x', '');
-        addNotation(`2. ${displaySan}`);
+        addNotation(`2. \${displaySan}`);
         if (game.isCheckmate()) {
-          // No annotation on the final mating move
           celebrate();
         } else {
-          // Not checkmate — black responds with random move
           setPhase('black_responding');
           setTimeout(() => {
             const blackMove = pickSafeBlackMove();
@@ -465,7 +436,7 @@ export default function HeroPuzzle() {
 
               const hist = gameRef.current.history({ verbose: true });
               const blackSan = hist[hist.length - 1].san.replace('x', '');
-              addNotation(`   ...${blackSan}`);
+              addNotation(`   ...\${blackSan}`);
             }
             setPhase('awaiting_mate');
           }, 600);
@@ -477,9 +448,6 @@ export default function HeroPuzzle() {
     [phase, applyMove, addNotation, celebrate, triggerAnnotation, pickSafeBlackMove]
   );
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // SHARED RESET HELPER
-  // ══════════════════════════════════════════════════════════════════════════
   const fullReset = useCallback(() => {
     if (solveTimerRef.current) { clearTimeout(solveTimerRef.current); solveTimerRef.current = null; }
     solveAbortRef.current = true;
@@ -508,32 +476,19 @@ export default function HeroPuzzle() {
     }
   }, [clearTrail, clearAnnotation]);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // SOLVE — sequential async animation (replaces old useEffect stepper)
-  // Each step: animate piece → commit board state → pause → next step.
-  // ══════════════════════════════════════════════════════════════════════════
   const handleSolve = useCallback(async () => {
     fullReset();
-
-    // Wait for reset render to flush
     await new Promise(r => { solveTimerRef.current = setTimeout(r, 300); });
-
     solveAbortRef.current = false;
     setPhase('solving');
 
-    console.log('[Solve] Starting. FEN:', gameRef.current.fen());
-
-    // ── Step 0: White's first move (from PUZZLE.solution[0]) ──────────────
     const whiteStep = PUZZLE.solution[0];
-
-    await new Promise(r => {
-      solveTimerRef.current = setTimeout(r, 500);
-    });
+    await new Promise(r => { solveTimerRef.current = setTimeout(r, 500); });
     if (solveAbortRef.current) return;
 
     setSolveStep(0);
     setSolveAnnotation(whiteStep.annotation);
-    addNotation(`1. ${whiteStep.san}`);
+    addNotation(`1. \${whiteStep.san}`);
 
     if (whiteStep.animate) {
       await animatePieceMove(whiteStep.from, whiteStep.to, boardInnerRef.current);
@@ -549,15 +504,11 @@ export default function HeroPuzzle() {
     }
     if (solveAbortRef.current) return;
 
-    // ── Step 1: Black's response — use shared pickSafeBlackMove ───────────
-    await new Promise(r => {
-      solveTimerRef.current = setTimeout(r, 900);
-    });
+    await new Promise(r => { solveTimerRef.current = setTimeout(r, 900); });
     if (solveAbortRef.current) return;
 
     const blackMoveSan = pickSafeBlackMove();
     if (blackMoveSan) {
-      // Get verbose info for the chosen move so we can animate it
       const probe = new Chess(gameRef.current.fen());
       const moveResult = probe.move(blackMoveSan);
 
@@ -568,25 +519,20 @@ export default function HeroPuzzle() {
 
         setSolveStep(1);
         setSolveAnnotation(PUZZLE.solution[1].annotation);
-        addNotation(`   ...${blackDisplay}`);
+        addNotation(`   ...\${blackDisplay}`);
 
         await animatePieceMove(blackFrom, blackTo, boardInnerRef.current);
         if (solveAbortRef.current) return;
 
         applyMove(blackFrom, blackTo);
-
         await new Promise(r => { solveTimerRef.current = setTimeout(r, 350); });
         if (solveAbortRef.current) return;
       }
     }
 
-    // ── Step 2: White's mating move — find the checkmate reply ────────────
-    await new Promise(r => {
-      solveTimerRef.current = setTimeout(r, 900);
-    });
+    await new Promise(r => { solveTimerRef.current = setTimeout(r, 900); });
     if (solveAbortRef.current) return;
 
-    // Find the actual mating move from the current position
     const mateGame = new Chess(gameRef.current.fen());
     const whiteMoves = mateGame.moves({ verbose: true });
     const matingMove = whiteMoves.find((m) => {
@@ -600,7 +546,7 @@ export default function HeroPuzzle() {
 
       setSolveStep(2);
       setSolveAnnotation(PUZZLE.solution[2].annotation);
-      addNotation(`2. ${mateDisplay}`);
+      addNotation(`2. \${mateDisplay}`);
 
       await animatePieceMove(matingMove.from, matingMove.to, boardInnerRef.current);
       if (solveAbortRef.current) return;
@@ -609,11 +555,8 @@ export default function HeroPuzzle() {
     }
 
     if (solveAbortRef.current) return;
-
-    console.log('[Solve] Complete. Final FEN:', gameRef.current.fen());
     setMovesLeft(0);
 
-    // Celebration after a brief hold
     await new Promise(r => { solveTimerRef.current = setTimeout(r, 650); });
     if (!solveAbortRef.current) {
       celebrate();
@@ -623,6 +566,154 @@ export default function HeroPuzzle() {
   const resetPuzzle = useCallback(() => {
     fullReset();
   }, [fullReset]);
+}
+*/
+
+// ============================================================================
+// NEW HERO PUZZLE IMPLEMENTATION (EVERGREEN GAME AUTOPLAY & PUZZLE)
+// ============================================================================
+
+// ── Timing Configuration ─────────────────────────────────────────────────────
+// Adjust these values to configure the chessboard animation speed and pauses.
+// Values are defined in milliseconds (ms) for readability and ease of tweaking.
+const TIMING = {
+  MOVE_DURATION: 250,       // Duration of the piece glide animation in milliseconds (default: 220ms)
+  NORMAL_MOVE_DELAY: 1000,   // Delay/pause after a normal move finishes in milliseconds (default: 300ms)
+  CAPTURE_DELAY: 1250,       // Delay/pause after a capture move finishes in milliseconds (default: 550ms)
+  CHECK_DELAY: 1250,         // Delay/pause after a checking move finishes in milliseconds (default: 400ms)
+  PUZZLE_START_DELAY: 500, // Pause at the stop position before transitioning to puzzle mode in milliseconds (default: 1500ms)
+  REPLAY_DELAY: 100,        // Pause/delay before replay autoplay loop begins in milliseconds (default: 100ms)
+};
+
+// ── Board theme ──────────────────────────────────────────────────────────────
+const BOARD_DARK = '#769656';
+const BOARD_LIGHT = '#EEEED2';
+
+// ── The Evergreen Game Moves (Moves 1 to 20 for autoplay, 21 to 24 for puzzle)
+const PGN_MOVES = [
+  "e4", "e5",
+  "Nf3", "Nc6",
+  "Bc4", "Bc5",
+  "b4", "Bxb4",
+  "c3", "Ba5",
+  "d4", "exd4",
+  "O-O", "d3",
+  "Qb3", "Qf6",
+  "e5", "Qg6",
+  "Re1", "Nge7",
+  "Ba3", "b5",
+  "Qxb5", "Rb8",
+  "Qa4", "Bb6",
+  "Nbd2", "Bb7",
+  "Ne4", "Qf5",
+  "Bxd3", "Qh5",
+  "Nf6+", "gxf6",
+  "exf6", "Rg8",
+  "Rad1", "Qxf3",
+  "Rxe7+", "Nxe7"
+];
+
+const PUZZLE_MOVES = [
+  "Qxd7+", "Kxd7",
+  "Bf5+", "Ke8",
+  "Bd7+", "Kf8",
+  "Bxe7#"
+];
+
+const ALL_MOVES = [...PGN_MOVES, ...PUZZLE_MOVES];
+
+interface ProcessedMove {
+  san: string;
+  from: string;
+  to: string;
+  isCapture: boolean;
+  isCheck: boolean;
+  isCheckmate: boolean;
+  kingSquare: string | null;
+  fenAfter: string;
+}
+
+// Preprocess game steps at compile/load time
+function processGameMoves(): ProcessedMove[] {
+  const g = new Chess();
+  const processed: ProcessedMove[] = [];
+  for (const m of ALL_MOVES) {
+    const result = g.move(m);
+    if (!result) {
+      throw new Error(`Invalid move in sequence: ${m}`);
+    }
+    const isCheck = g.inCheck();
+    const isCheckmate = g.isCheckmate();
+
+    let kingSquare: string | null = null;
+    if (isCheck || isCheckmate) {
+      const checkedColor = g.turn(); // The side currently in check
+      const board = g.board();
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const piece = board[r][c];
+          if (piece && piece.type === 'k' && piece.color === checkedColor) {
+            kingSquare = piece.square;
+            break;
+          }
+        }
+        if (kingSquare) break;
+      }
+    }
+
+    processed.push({
+      san: m,
+      from: result.from,
+      to: result.to,
+      isCapture: !!result.captured,
+      isCheck,
+      isCheckmate,
+      kingSquare,
+      fenAfter: g.fen()
+    });
+  }
+  return processed;
+}
+
+const PROCESSED_MOVES = processGameMoves();
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+export default function HeroPuzzle() {
+  const { fireConfetti } = useConfetti();
+  const glowRef = useBoardCursorGlow<HTMLDivElement>();
+  const { svgRef, showTrail, clearTrail } = useMoveTrail();
+  const { activeAnnotation, triggerAnnotation, clearAnnotation } = useMoveAnnotation();
+
+  // ── Chessboard refs ────────────────────────────────────────────────────────
+  const boardWrapRef = useRef<HTMLDivElement>(null);
+  const boardCardRef = useRef<HTMLDivElement>(null);
+  const boardInnerRef = useRef<HTMLDivElement>(null);
+  const checkmateRef = useRef<HTMLDivElement>(null);
+
+  // ── State variables ────────────────────────────────────────────────────────
+  const [phase, setPhase] = useState<'AUTOPLAY' | 'PUZZLE' | 'SUCCESS' | 'REPLAY'>('AUTOPLAY');
+  const [gameFen, setGameFen] = useState<string>(START_FEN);
+  const [, setCurrentMoveIndex] = useState<number>(-1);
+  const [puzzleStep, setPuzzleStep] = useState<number>(0);
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
+  const [checkedKingSquare, setCheckedKingSquare] = useState<string | null>(null);
+  const [isCheckmateGlow, setIsCheckmateGlow] = useState<boolean>(false);
+  const [showTryAgain, setShowTryAgain] = useState<boolean>(false);
+
+  const abortRef = useRef<boolean>(false);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // BOARD ENTRANCE ANIMATION
+  // Runs once on mount.
+  // ══════════════════════════════════════════════════════════════════════════
+  useLayoutEffect(() => {
+    if (prefersReducedMotion() || !boardCardRef.current) return;
+    gsap.fromTo(
+      boardCardRef.current,
+      { opacity: 0, y: 18, scale: 0.97 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out', delay: 0.6 }
+    );
+  }, []);
 
   // ── Magnetic piece hover effect ────────────────────────────────────────────
   useEffect(() => {
@@ -680,63 +771,477 @@ export default function HeroPuzzle() {
   }, []);
 
   // ══════════════════════════════════════════════════════════════════════════
-  // Square styles
+  // PREMIUM PIECE ANIMATION SYSTEM
+  // Smooth Bezier glide with specialized capture animation fade-out & slams.
+  // ══════════════════════════════════════════════════════════════════════════
+  const animatePieceMove = useCallback((
+    fromSq: string,
+    toSq: string,
+    boardEl: HTMLDivElement | null,
+    isCapture = false
+  ): Promise<void> => {
+    return new Promise((resolve) => {
+      if (prefersReducedMotion() || !boardEl) { resolve(); return; }
+
+      const getSquareCenter = (sq: string) => {
+        const el = boardEl.querySelector(`[data-square="${sq}"]`) as HTMLElement | null;
+        if (!el) return null;
+        const br = boardEl.getBoundingClientRect();
+        const sr = el.getBoundingClientRect();
+        return { x: sr.left + sr.width / 2 - br.left, y: sr.top + sr.height / 2 - br.top };
+      };
+
+      const from = getSquareCenter(fromSq);
+      const to = getSquareCenter(toSq);
+      const pieceEl = boardEl.querySelector(
+        `[data-square="${fromSq}"] [data-testid^="piece-"]`
+      ) as HTMLElement | null;
+
+      if (!pieceEl || !from || !to) { resolve(); return; }
+
+      // Clean up stray ghosts
+      boardEl.querySelectorAll('.gsap-moving').forEach((el) => {
+        if (el !== boardEl) {
+          el.remove();
+        }
+      });
+
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Bezier curve calculations
+      const arcAmt = dist * 0.15;
+      const perpX = dist > 0 ? (-dy / dist) * arcAmt : 0;
+      const perpY = dist > 0 ? (dx / dist) * arcAmt : 0;
+      const controlX = dx / 2 + perpX;
+      const controlY = dy / 2 + perpY;
+
+      // Add gsap-moving exemption class
+      pieceEl.classList.add('gsap-moving');
+
+      // Ghost trail setup
+      boardEl.style.position = 'relative';
+      const ghost = pieceEl.cloneNode(true) as HTMLElement;
+      ghost.classList.add('gsap-moving');
+      ghost.style.cssText = `
+        position: absolute; pointer-events: none; z-index: 15;
+        left: ${from.x - pieceEl.offsetWidth / 2}px;
+        top: ${from.y - pieceEl.offsetHeight / 2}px;
+        width: ${pieceEl.offsetWidth}px;
+        height: ${pieceEl.offsetHeight}px;
+        opacity: 0.25; filter: blur(1px); transform: none;
+      `;
+      boardEl.appendChild(ghost);
+
+      // Captured piece lookup
+      const targetPieceEl = boardEl.querySelector(
+        `[data-square="${toSq}"] [data-testid^="piece-"]`
+      ) as HTMLElement | null;
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          gsap.set(pieceEl, { clearProps: 'all' });
+          pieceEl.classList.remove('gsap-moving');
+          ghost.remove();
+          resolve();
+        },
+      });
+
+      // User-configurable movement durations
+      const moveSec = TIMING.MOVE_DURATION / 1000;
+      const lagSec = moveSec * 0.14; // scale lag proportionally (e.g. ~0.03s for 220ms duration)
+
+      // 1) Lift piece immediately
+      tl.to(pieceEl, {
+        scale: 1.08,
+        duration: 0.05,
+        ease: 'power2.out',
+        transformOrigin: 'center center',
+      });
+
+      // 2) Move piece along the Bezier curve
+      const pathObj = { t: 0 };
+      tl.to(pathObj, {
+        t: 1,
+        duration: moveSec,
+        ease: 'power3.out',
+        onUpdate: () => {
+          const t = pathObj.t;
+          const curX = 2 * (1 - t) * t * controlX + t * t * dx;
+          const curY = 2 * (1 - t) * t * controlY + t * t * dy;
+          gsap.set(pieceEl, { x: curX, y: curY });
+        }
+      }, 0);
+
+      // 3) Animate ghost trail following the curve with proportioned lag
+      const ghostObj = { t: 0 };
+      gsap.set(ghost, { scale: 1.08 });
+      tl.to(ghostObj, {
+        t: 1,
+        duration: moveSec,
+        ease: 'power3.out',
+        onUpdate: () => {
+          const t = ghostObj.t;
+          const curX = 2 * (1 - t) * t * controlX + t * t * dx;
+          const curY = 2 * (1 - t) * t * controlY + t * t * dy;
+          gsap.set(ghost, {
+            x: curX,
+            y: curY,
+            opacity: 0.25 * (1 - t)
+          });
+        }
+      }, lagSec);
+
+      // Capture animation polish: shrink and fade target piece
+      if (isCapture && targetPieceEl) {
+        tl.to(targetPieceEl, {
+          opacity: 0,
+          scale: 0.4,
+          duration: 0.15,
+          ease: 'power2.in',
+        }, 0);
+      }
+
+      // 4) Landing bounce (starts at moveSec)
+      tl.to(pieceEl, {
+        scale: isCapture ? 0.82 : 0.94, // deeper drop for capture moves
+        duration: 0.05,
+        ease: 'power1.in',
+      }, moveSec);
+      tl.to(pieceEl, {
+        scale: isCapture ? 1.05 : 1.02,
+        duration: 0.04,
+        ease: 'power1.out',
+      });
+      tl.to(pieceEl, {
+        scale: 1,
+        duration: 0.03,
+        ease: 'none',
+      });
+    });
+  }, []);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // MOVE PLAYER AND TIMING COORDINATION
+  // ══════════════════════════════════════════════════════════════════════════
+  const playStep = useCallback(async (moveIndex: number): Promise<void> => {
+    const move = PROCESSED_MOVES[moveIndex];
+    if (!move) return;
+
+    setLastMove({ from: move.from, to: move.to });
+
+    await animatePieceMove(move.from, move.to, boardInnerRef.current, move.isCapture);
+    if (abortRef.current) return;
+
+    setGameFen(move.fenAfter);
+    showTrail(move.from, move.to);
+
+    // Pulse checked king's square if checked
+    if (move.isCheck || move.isCheckmate) {
+      setCheckedKingSquare(move.kingSquare);
+      await new Promise(r => setTimeout(r, 450));
+      setCheckedKingSquare(null);
+    }
+  }, [animatePieceMove, showTrail]);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // AUTOPLAY TIMELINE LOOP
+  // Plays moves 1-20 (Indices 0 to 39), then enters puzzle mode.
+  // ══════════════════════════════════════════════════════════════════════════
+  const runAutoplay = useCallback(async (startIndex: number) => {
+    abortRef.current = false;
+    for (let i = startIndex; i < 40; i++) {
+      if (abortRef.current) return;
+      setCurrentMoveIndex(i);
+      await playStep(i);
+      if (abortRef.current) return;
+
+      // Determine pause after the move based on move attributes
+      const move = PROCESSED_MOVES[i];
+      let pauseTime = TIMING.NORMAL_MOVE_DELAY;
+      if (move.isCheck) {
+        pauseTime = TIMING.CHECK_DELAY; // Pause after check pulse
+      } else if (move.isCapture) {
+        pauseTime = TIMING.CAPTURE_DELAY; // Pause after capture animation
+      }
+      await new Promise(r => setTimeout(r, pauseTime));
+    }
+
+    if (abortRef.current) return;
+
+    // Final pause before transition to puzzle (user-configurable)
+    await new Promise(r => setTimeout(r, TIMING.PUZZLE_START_DELAY));
+    if (abortRef.current) return;
+
+    setPhase('PUZZLE');
+    setCurrentMoveIndex(40);
+    setPuzzleStep(0);
+    setShowTryAgain(false);
+  }, [playStep]);
+
+  // Launch autoplay on initial mount
+  useEffect(() => {
+    runAutoplay(0);
+    return () => {
+      abortRef.current = true;
+    };
+  }, [runAutoplay]);
+
+  // ─── Verification state alignment helper ───
+  const getExpectedPrevFEN = useCallback(() => {
+    if (puzzleStep === 0) return PROCESSED_MOVES[39].fenAfter;
+    return PROCESSED_MOVES[40 + puzzleStep * 2 - 1].fenAfter;
+  }, [puzzleStep]);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CHECKMATE POPUP CELEBRATION (RESTORED PREVIOUS BEHAVIOUR)
+  // ══════════════════════════════════════════════════════════════════════════
+  const runCheckmateImpact = useCallback((kingSq: string | null): Promise<void> => {
+    return new Promise(resolve => {
+      if (prefersReducedMotion()) { resolve(); return; }
+
+      const board = boardInnerRef.current;
+      const card = boardCardRef.current;
+      const overlay = checkmateRef.current;
+      if (!board || !card || !overlay) { resolve(); return; }
+
+      const tl = gsap.timeline({ onComplete: resolve });
+
+      // a) Flash: board briefly goes bright white then snaps back
+      tl.to(board, {
+        filter: 'brightness(3)',
+        duration: 0.08,
+        ease: 'none',
+      })
+        .to(board, {
+          filter: 'brightness(1)',
+          duration: 0.25,
+          ease: 'power2.out',
+        });
+
+      // b) King square pulse (red tint)
+      tl.call(() => {
+        if (kingSq) {
+          setCheckedKingSquare(kingSq);
+          setTimeout(() => setCheckedKingSquare(null), 1200);
+        }
+      }, [], '<0.05');
+
+      // c) CHECKMATE text overlay — scale in from 0
+      tl.set(overlay, { display: 'flex', opacity: 0, scale: 0.6 })
+        .to(overlay, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.45,
+          ease: 'back.out(1.7)',
+        }, '+=0.1');
+
+      // d) Glow expansion ring around board card
+      tl.fromTo(card,
+        { boxShadow: '0 0 0px 0px rgba(99,102,241,0)' },
+        {
+          boxShadow: '0 0 80px 24px rgba(99,102,241,0.6)',
+          duration: 0.5,
+          ease: 'power2.out',
+          yoyo: true,
+          repeat: 2,
+          onComplete: () => {
+            gsap.to(card, {
+              boxShadow: '0 0 30px 8px rgba(99,102,241,0.25)',
+              duration: 0.8,
+            });
+          },
+        },
+        '<'
+      );
+    });
+  }, []);
+
+  const celebrate = useCallback(async (kingSq: string | null) => {
+    // Show CHECKMATE popup immediately using existing styling and GSAP timeline
+    await runCheckmateImpact(kingSq);
+
+    // Hold the checkmate text for a brief pause before fading it out
+    await new Promise(r => setTimeout(r, 900));
+    if (abortRef.current) return;
+
+    fireConfetti();
+
+    // Fade checkmate badge overlay out smoothly
+    if (checkmateRef.current) {
+      gsap.to(checkmateRef.current, {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.3,
+        onComplete: () => {
+          if (checkmateRef.current) {
+            checkmateRef.current.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // Set success state to render card layout below the board
+    setPhase('SUCCESS');
+    setIsCheckmateGlow(true);
+  }, [runCheckmateImpact, fireConfetti]);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // INTERACTIVE USER DROP AND SOLUTION VALIDATION
+  // ══════════════════════════════════════════════════════════════════════════
+  const onDrop = useCallback(
+    (sourceSquare: string, targetSquare: string): boolean => {
+      if (phase !== 'PUZZLE') return false;
+
+      // Safety check to ensure the board is actually ready for the user move
+      const expectedPrevFen = getExpectedPrevFEN();
+      if (gameFen !== expectedPrevFen) {
+        return false;
+      }
+
+      const expectedWhiteMove = PROCESSED_MOVES[40 + puzzleStep * 2];
+      if (!expectedWhiteMove) return false;
+
+      // Validate White move correctness
+      if (sourceSquare === expectedWhiteMove.from && targetSquare === expectedWhiteMove.to) {
+        setShowTryAgain(false);
+
+        // Update to White move position immediately
+        setGameFen(expectedWhiteMove.fenAfter);
+        setLastMove({ from: expectedWhiteMove.from, to: expectedWhiteMove.to });
+        showTrail(expectedWhiteMove.from, expectedWhiteMove.to);
+        triggerAnnotation(expectedWhiteMove.to, '!!');
+
+        if (expectedWhiteMove.isCheck || expectedWhiteMove.isCheckmate) {
+          setCheckedKingSquare(expectedWhiteMove.kingSquare);
+          setTimeout(() => setCheckedKingSquare(null), 450);
+        }
+
+        // Final move solved
+        if (expectedWhiteMove.isCheckmate) {
+          celebrate(expectedWhiteMove.kingSquare);
+          return true;
+        }
+
+        // Play forced Black reply after a brief pause
+        const expectedBlackMove = PROCESSED_MOVES[40 + puzzleStep * 2 + 1];
+        if (expectedBlackMove) {
+          setTimeout(async () => {
+            if (abortRef.current) return;
+
+            setLastMove({ from: expectedBlackMove.from, to: expectedBlackMove.to });
+
+            await animatePieceMove(expectedBlackMove.from, expectedBlackMove.to, boardInnerRef.current, expectedBlackMove.isCapture);
+            if (abortRef.current) return;
+
+            setGameFen(expectedBlackMove.fenAfter);
+            showTrail(expectedBlackMove.from, expectedBlackMove.to);
+
+            if (expectedBlackMove.isCheck) {
+              setCheckedKingSquare(expectedBlackMove.kingSquare);
+              setTimeout(() => setCheckedKingSquare(null), 450);
+            }
+
+            setPuzzleStep(prev => prev + 1);
+          }, 600);
+        }
+
+        return true;
+      } else {
+        // Wrong move - snap back and show try again
+        setShowTryAgain(true);
+        return false;
+      }
+    },
+    [phase, puzzleStep, gameFen, getExpectedPrevFEN, showTrail, triggerAnnotation, animatePieceMove, celebrate]
+  );
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // REPLAY TIMELINE RESET AND TRIGGER
+  // ══════════════════════════════════════════════════════════════════════════
+  const handleReplay = useCallback(() => {
+    abortRef.current = true;
+    clearTrail();
+    clearAnnotation();
+    setCheckedKingSquare(null);
+    setIsCheckmateGlow(false);
+    setShowTryAgain(false);
+    setPuzzleStep(0);
+    setLastMove(null);
+    setGameFen(START_FEN);
+
+    // Reset checkmate overlay badge display immediately
+    if (checkmateRef.current) {
+      gsap.killTweensOf(checkmateRef.current);
+      gsap.set(checkmateRef.current, { display: 'none', opacity: 0, scale: 0.6 });
+    }
+
+    setPhase('REPLAY');
+
+    setTimeout(() => {
+      abortRef.current = false;
+      setPhase('AUTOPLAY');
+      runAutoplay(0);
+    }, TIMING.REPLAY_DELAY);
+  }, [runAutoplay, clearTrail, clearAnnotation]);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // RENDER SETUP
   // ══════════════════════════════════════════════════════════════════════════
   const customSquareStyles: Record<string, React.CSSProperties> = {};
 
-  // Last-move amber highlight
   if (lastMove) {
     customSquareStyles[lastMove.from] = { backgroundColor: 'rgba(255, 214, 10, 0.35)' };
     customSquareStyles[lastMove.to] = { backgroundColor: 'rgba(255, 214, 10, 0.50)' };
   }
 
-  // King square pulse (red on checkmate)
-  if (kingPulse) {
-    customSquareStyles[PUZZLE.kingSquare] = {
+  if (checkedKingSquare) {
+    customSquareStyles[checkedKingSquare] = {
       backgroundColor: 'rgba(239, 68, 68, 0.55)',
       boxShadow: 'inset 0 0 20px rgba(239, 68, 68, 0.8)',
       animation: 'king-pulse 0.4s ease-in-out 3',
     };
   }
 
-  // ── Phase labels ───────────────────────────────────────────────────────────
-  const phaseLabel: Record<PuzzlePhase, string> = {
-    idle: 'White to move',
-    white_moved: 'White moved',
-    black_responding: 'Black thinking…',
-    awaiting_mate: 'Deliver checkmate!',
-    solved: '✓ Puzzle Solved!',
-    failed: 'Not checkmate — try again',
-    solving: 'Watching solution…',
-  };
+  const movesLeft = phase === 'SUCCESS' ? 0 : 4 - puzzleStep;
+  const isInteractive = phase === 'PUZZLE' && gameFen === getExpectedPrevFEN();
 
-  const isInteractive = phase === 'idle' || phase === 'awaiting_mate';
-
-  // Merge the two refs (boardWrapRef + glowRef) onto the same DOM node
+  // Merge outer wrapper and cursor glow refs
   const mergedWrapRef = useCallback((el: HTMLDivElement | null) => {
     boardWrapRef.current = el;
     (glowRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
   }, [glowRef]);
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // RENDER
-  // ══════════════════════════════════════════════════════════════════════════
+  // Compute text labels based on phase
+  let mainLabel = "The Evergreen Game";
+  let subLabel = "Anderssen vs Dufresne, 1852";
+
+  if (phase === 'PUZZLE') {
+    mainLabel = "Can you finish the Evergreen Game?";
+    subLabel = "White to move.";
+  } else if (phase === 'SUCCESS') {
+    mainLabel = "Brilliant.";
+    subLabel = "Anderssen vs Dufresne, 1852 — The Evergreen Game.";
+  } else if (phase === 'REPLAY') {
+    mainLabel = "Resetting position...";
+    subLabel = "Restarting autoplay...";
+  }
 
   return (
     <div className="flex flex-col gap-4">
-
-      {/*
-        ── Outer wrapper: cursor glow + entrance animation ───────────────────
-        CSS vars --glow-x / --glow-y / --glow-opacity are set by useBoardCursorGlow
-        and consumed by the ::after pseudo-element in index.css (pointer-events:none).
-        mergedWrapRef connects both boardWrapRef and glowRef to this node.
-      */}
+      {/* ── Outer Wrapper: cursor glow + entrance animation ── */}
       <div
         ref={mergedWrapRef}
         className="relative rounded-xl overflow-hidden board-cursor-glow"
-        style={{ transition: 'box-shadow 0.4s ease' }}
+        style={{
+          transition: 'box-shadow 0.4s ease',
+          boxShadow: isCheckmateGlow
+            ? '0 0 50px 10px rgba(99, 102, 241, 0.4), 0 0 20px 5px rgba(139, 92, 246, 0.3)'
+            : undefined,
+        }}
       >
-        {/* ── Floating ambient particles (pointer-events:none inherits) ──── */}
+        {/* Floating background particles */}
         <div className="hero-particles" aria-hidden="true">
           {['♞', '♝', '♜', '♟', '♞', '♝', '♜', '♟'].map((symbol, i) => (
             <span key={i} className={`hero-particle hero-particle-${i + 1}`}>
@@ -745,7 +1250,7 @@ export default function HeroPuzzle() {
           ))}
         </div>
 
-        {/* ── CHECKMATE impact overlay — GSAP toggles display:flex ────────── */}
+        {/* ── CHECKMATE impact overlay — GSAP toggles display:flex ── */}
         <div
           ref={checkmateRef}
           className="absolute inset-0 z-40 items-center justify-center pointer-events-none"
@@ -757,66 +1262,28 @@ export default function HeroPuzzle() {
           </div>
         </div>
 
-        {/* ── Solved badge (shown after impact sequence completes) ─────────── */}
-        {phase === 'solved' && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-            <div
-              className="px-6 py-3 rounded-2xl text-center animate-puzzle-solved"
-              style={{
-                background: 'linear-gradient(135deg, rgba(99,102,241,0.95) 0%, rgba(139,92,246,0.95) 100%)',
-                backdropFilter: 'blur(8px)',
-                boxShadow: '0 8px 40px rgba(99,102,241,0.6)',
-              }}
-            >
-              <Trophy className="w-8 h-8 text-yellow-300 mx-auto mb-1" />
-              <p className="text-white font-bold text-lg font-sans">Puzzle Solved!</p>
-            </div>
-          </div>
-        )}
-
-        {/* ── Failed overlay ───────────────────────────────────────────────── */}
-        {phase === 'failed' && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="text-center space-y-3 px-6">
-              <AlertTriangle className="w-10 h-10 text-red-400 mx-auto" />
-              <p className="text-white font-bold font-sans">Not checkmate!</p>
-              <button
-                onClick={resetPuzzle}
-                className="
-                  flex items-center gap-2 mx-auto px-4 py-2
-                  bg-brand-accent hover:bg-brand-accent/90
-                  text-white rounded-lg text-sm font-semibold
-                  transition-all duration-200
-                  btn-glow-container btn-glow-accent
-                "
-              >
-                <RotateCcw className="w-4 h-4" />
-                Try Again
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/*
-          ── Board card — entrance animation target (boardCardRef)
-          GSAP animates opacity/y/scale on this element on mount.
-          Also receives boxShadow glow on checkmate.
-        */}
+        {/* Board card container */}
         <div
           ref={boardCardRef}
           className="bg-brand-surface"
-          style={{ willChange: 'transform, opacity, box-shadow', opacity: 0, transformStyle: 'preserve-3d' }}
+          style={{
+            willChange: 'transform, opacity, box-shadow',
+            opacity: 0,
+            transformStyle: 'preserve-3d',
+            transition: 'box-shadow 1.5s ease-in-out',
+          }}
         >
-          {/*
-            ── Board inner — SVG trail overlay sits here
-            overflow:hidden clips the board; position:relative anchors the SVG.
-          */}
+          {/* Board inner frame */}
           <div
             ref={boardInnerRef}
             className="aspect-square overflow-hidden relative"
-            style={{ willChange: 'filter', transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
+            style={{
+              willChange: 'filter',
+              transform: 'translateZ(24px)',
+              transformStyle: 'preserve-3d',
+            }}
           >
-            {/* ── Move trail SVG overlay (pointer-events:none — never blocks) ── */}
+            {/* SVG Trail overlay */}
             <svg
               ref={svgRef}
               className="absolute inset-0 w-full h-full pointer-events-none"
@@ -824,12 +1291,12 @@ export default function HeroPuzzle() {
               aria-hidden="true"
             />
 
-            {/* ── Chess board ───────────────────────────────────────────────── */}
+            {/* Chessboard component */}
             <Chessboard
               options={{
                 position: gameFen,
                 onPieceDrop: ({ sourceSquare, targetSquare }) =>
-                  onDrop(sourceSquare, targetSquare ?? null),
+                  onDrop(sourceSquare, targetSquare ?? ''),
                 darkSquareStyle: { backgroundColor: BOARD_DARK },
                 lightSquareStyle: { backgroundColor: BOARD_LIGHT },
                 boardStyle: {
@@ -838,16 +1305,15 @@ export default function HeroPuzzle() {
                 },
                 showNotation: false,
                 squareStyles: customSquareStyles,
-                animationDurationInMs: phase === 'solving' ? 0 : 280,
+                animationDurationInMs: 0, // Piece sliding is handled by our GSAP system
                 allowDragging: isInteractive,
               }}
             />
 
-            {/* ── Move Quality Annotation Badge ── */}
+            {/* Move quality annotations (e.g. !!) */}
             <MoveAnnotation activeAnnotation={activeAnnotation} />
 
-            {/* ── Engraved board coordinates ── */}
-            {/* File labels a–h: bottom-left of each file column's bottom square */}
+            {/* Board coordinates lettering */}
             {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((file, i) => (
               <span
                 key={`file-${file}`}
@@ -859,7 +1325,7 @@ export default function HeroPuzzle() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#5e7a44' : '#c8c8a6', // engraved: slightly darker than square
+                  color: i % 2 === 0 ? '#5e7a44' : '#c8c8a6',
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.92,
                   pointerEvents: 'none',
@@ -872,7 +1338,6 @@ export default function HeroPuzzle() {
               </span>
             ))}
 
-            {/* Rank labels 8–1: bottom-left of each rank row's leftmost square, offset vertically to prevent overlap */}
             {['8', '7', '6', '5', '4', '3', '2', '1'].map((rank, i) => (
               <span
                 key={`rank-${rank}`}
@@ -884,7 +1349,7 @@ export default function HeroPuzzle() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '15px',
                   fontWeight: 700,
-                  color: i % 2 === 0 ? '#c8c8a6' : '#5e7a44', // engraved: slightly darker than square
+                  color: i % 2 === 0 ? '#c8c8a6' : '#5e7a44',
                   textShadow: '0px -1px 1px rgba(0,0,0,0.35), 0px 1px 1px rgba(255,255,255,0.4)',
                   opacity: 0.92,
                   pointerEvents: 'none',
@@ -898,27 +1363,32 @@ export default function HeroPuzzle() {
             ))}
           </div>
         </div>
-      </div>{/* end board-cursor-glow */}
+      </div>
 
-      {/* ── Below-board label: White to play + moves counter ──────────────── */}
+      {/* ── Below-board Info Panel ── */}
       <div className="flex items-center justify-between px-0">
         <div>
           <p className="text-xs text-brand-secondary font-sans font-medium uppercase tracking-wider">
-            {PUZZLE.label}
+            {mainLabel}
           </p>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm font-sans text-white font-semibold">
-              {phaseLabel[phase]}
+          <div className="flex flex-col gap-0.5 mt-1">
+            <span className="text-sm font-sans text-white font-semibold leading-tight">
+              {subLabel}
             </span>
+            {phase === 'PUZZLE' && showTryAgain && (
+              <span className="text-xs font-sans text-red-400 font-medium animate-pulse mt-0.5">
+                Incorrect move. Try again.
+              </span>
+            )}
           </div>
         </div>
         <div
           className={`
             flex flex-col items-center px-4 py-2 rounded-xl border
             transition-all duration-500
-            ${phase === 'solved'
-              ? 'bg-brand-accent/20 border-brand-accent/50 text-brand-accent'
-              : phase === 'failed'
+            \${phase === 'SUCCESS'
+              ? 'bg-brand-accent/20 border-brand-accent/50 text-brand-accent shadow-lg shadow-brand-accent/15'
+              : phase === 'PUZZLE' && showTryAgain
                 ? 'bg-red-500/10 border-red-500/30 text-red-400'
                 : 'bg-brand-surface border-brand-border text-white'}
           `}
@@ -932,69 +1402,88 @@ export default function HeroPuzzle() {
         </div>
       </div>
 
-      {/* ── Solve annotation ─────────────────────────────────────────────────── */}
-      {phase === 'solving' && solveAnnotation && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-accent/10 border border-brand-accent/25 animate-fade-in">
-          <ChevronRight className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-          <p className="text-xs font-sans text-brand-secondary italic">
-            {solveAnnotation}
-          </p>
-        </div>
-      )}
+      {/* ── Action Buttons ── */}
+      <div className="flex gap-3 mt-1">
+        {phase === 'AUTOPLAY' && (
+          <button
+            disabled
+            className="
+              flex-1 flex items-center justify-center gap-2
+              px-4 py-2.5 rounded-lg
+              font-sans text-sm font-semibold
+              bg-brand-surface border border-brand-border
+              text-brand-secondary opacity-50
+              btn-glow-container btn-glow-surface
+            "
+          >
+            <Play className="w-4 h-4 text-brand-accent animate-pulse" />
+            Autoplay in Progress...
+          </button>
+        )}
 
-      {/* Notation panel intentionally removed */}
+        {phase === 'PUZZLE' && (
+          <>
+            <button
+              onClick={() => {
+                setPuzzleStep(0);
+                const afterAutoplayMove = PROCESSED_MOVES[39];
+                setGameFen(afterAutoplayMove.fenAfter);
+                setLastMove({ from: afterAutoplayMove.from, to: afterAutoplayMove.to });
+                setCheckedKingSquare(null);
+                setShowTryAgain(false);
+              }}
+              className="
+                flex-1 flex items-center justify-center gap-2
+                px-4 py-2.5 rounded-lg
+                font-sans text-sm font-semibold
+                bg-brand-surface border border-brand-border
+                text-brand-secondary hover:text-white
+                hover:border-brand-accent/40 hover:bg-white/5
+                transition-all duration-200
+                btn-glow-container btn-glow-surface
+              "
+            >
+              <RotateCcw className="w-4 h-4 text-brand-accent" />
+              Reset Puzzle
+            </button>
+            <button
+              onClick={handleReplay}
+              className="
+                flex-1 flex items-center justify-center gap-2
+                px-4 py-2.5 rounded-lg
+                font-sans text-sm font-semibold
+                bg-brand-surface border border-brand-border
+                text-brand-secondary hover:text-white
+                hover:border-brand-accent/40 hover:bg-white/5
+                transition-all duration-200
+                btn-glow-container btn-glow-surface
+              "
+            >
+              <RotateCcw className="w-4 h-4 text-indigo-400" />
+              Replay Full Game
+            </button>
+          </>
+        )}
 
-      {/* ── Action buttons ───────────────────────────────────────────────────── */}
-      <div className="flex gap-3">
-        <button
-          id="hero-puzzle-solve-btn"
-          onClick={handleSolve}
-          disabled={phase === 'solving' || phase === 'black_responding'}
-          className="
-            flex-1 flex items-center justify-center gap-2
-            px-4 py-2.5 rounded-lg
-            font-sans text-sm font-semibold
-            bg-brand-surface border border-brand-border
-            text-brand-secondary hover:text-white
-            hover:border-brand-accent/40 hover:bg-white/5
-            transition-all duration-200
-            disabled:opacity-40
-            btn-glow-container btn-glow-surface
-            group
-          "
-          style={{
-            cursor: (phase === 'solving' || phase === 'black_responding') ? 'not-allowed' : 'pointer',
-          }}
-        >
-          <Play className="w-4 h-4 text-brand-accent group-hover:scale-110 transition-transform" />
-          Solve
-        </button>
-
-        <button
-          id="hero-puzzle-reset-btn"
-          onClick={resetPuzzle}
-          disabled={phase === 'idle'}
-          className="
-            flex items-center justify-center gap-2
-            px-4 py-2.5 rounded-lg
-            font-sans text-sm font-semibold
-            bg-brand-surface border border-brand-border
-            text-brand-secondary hover:text-white
-            hover:border-red-400/40 hover:bg-white/5
-            transition-all duration-200
-            disabled:opacity-40
-            group
-          "
-          style={{
-            cursor: phase === 'idle' ? 'not-allowed' : 'pointer',
-          }}
-        >
-          <RotateCcw className="w-4 h-4 group-hover:rotate-[-45deg] transition-transform duration-300" />
-          Reset
-        </button>
+        {phase === 'SUCCESS' && (
+          <button
+            onClick={handleReplay}
+            className="
+              flex-1 flex items-center justify-center gap-2
+              px-4 py-2.5 rounded-lg
+              font-sans text-sm font-semibold
+              bg-brand-accent hover:bg-brand-accent/95
+              text-white
+              transition-all duration-200
+              btn-glow-container btn-glow-accent
+              group
+            "
+          >
+            <RotateCcw className="w-4 h-4 group-hover:rotate-[-45deg] transition-transform duration-300" />
+            Replay
+          </button>
+        )}
       </div>
-
-
     </div>
   );
 }
