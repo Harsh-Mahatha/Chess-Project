@@ -14,6 +14,7 @@ import BrandSection from './components/BrandSection';
 import ProductDemo from './components/ProductDemo';
 import PartnerCTA from './components/PartnerCTA';
 import Footer from './components/Footer';
+import GlobalBackground from './components/GlobalBackground';
 
 import { ParticlesProvider } from '@tsparticles/react';
 import { loadConfettiCannonPreset } from '@tsparticles/preset-confetti-cannon';
@@ -25,6 +26,7 @@ const initParticles = async (engine: any) => {
 function App() {
   return (
     <ParticlesProvider init={initParticles}>
+      <GlobalBackground />
       {/* smooth-wrapper + smooth-content: ScrollSmoother-ready DOM structure.
          ScrollTrigger uses #smooth-content as the scroller when Club is enabled. */}
       <div id="smooth-wrapper">
