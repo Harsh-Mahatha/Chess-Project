@@ -55,20 +55,31 @@ export default function ContactSection() {
     setStatus('submitting');
 
     try {
-      // Using mailto: as the submission mechanism since no backend exists in this demo.
-      // In production, replace with a real API endpoint (e.g. /api/contact).
-      const recipient = 'orandsw@gmail.com';
-      const subject = encodeURIComponent('ChessCraft Contact Form');
-      const body = encodeURIComponent(`From: ${email}\n\n${message}`);
-      const mailtoLink = `mailto:${recipient}?subject=${subject}&body=${body}`;
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: '1c50ef93-da1d-47e8-b0f7-9a258dabeeca',
+          subject: 'New Contact Form Submission',
+          from_name: 'ChessCraft Website',
+          email: email,
+          message: message
+        })
+      });
 
-      // Open native mail client
-      window.location.href = mailtoLink;
+      const data = await response.json();
 
-      // Slight delay so mailto fires before state update
-      await new Promise((r) => setTimeout(r, 600));
-      setStatus('success');
-    } catch {
+      if (data.success) {
+        setStatus('success');
+      } else {
+        console.error('Web3Forms Error:', data);
+        setStatus('error');
+      }
+    } catch (err) {
+      console.error('Submission failed:', err);
       setStatus('error');
     }
   };
@@ -315,7 +326,7 @@ export default function ContactSection() {
               <div className="space-y-2">
                 <h3 className="font-sans font-bold text-2xl text-white">Message Sent</h3>
                 <p className="font-sans text-[var(--muted)] leading-relaxed">
-                  Thank you for reaching out. Your default mail client has been opened with your message pre-filled.
+                  Thank you for reaching out. Your message has been sent successfully.
                   We'll get back to you as soon as possible.
                 </p>
               </div>
