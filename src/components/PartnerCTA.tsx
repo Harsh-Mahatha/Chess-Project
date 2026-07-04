@@ -62,7 +62,7 @@ export default function ContactSection() {
           Accept: 'application/json'
         },
         body: JSON.stringify({
-          access_key: '1c50ef93-da1d-47e8-b0f7-9a258dabeeca',
+          access_key: 'c47b4f02-f2e3-431d-b3e8-7de73e8e7d45',
           subject: 'New Contact Form Submission',
           from_name: 'ChessCraft Website',
           email: email,
