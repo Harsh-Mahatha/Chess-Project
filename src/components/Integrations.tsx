@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Video, Sparkles } from "lucide-react";
 import { useGSAP } from "../hooks/useGSAP";
 import { gsap, dur } from "../utils/gsapConfig";
+import { trackEvent, EVENTS } from "../analytics";
 
 // ── Custom Brand SVGs ─────────────────────────────────────────────────────────
 
@@ -243,6 +244,27 @@ export default function Integrations() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Analytics: fire section_viewed once when section enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          trackEvent({
+            event: EVENTS.SECTION_VIEWED,
+            section_id: 'integrations',
+            section_name: 'Connected Ecosystem',
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useGSAP(
     () => {

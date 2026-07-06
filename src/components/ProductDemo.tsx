@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useButtonGlow } from '../hooks/useButtonGlow';
+import { trackEvent, EVENTS, DIFFICULTY_LABELS } from '../analytics';
 
 // ── Board colours ─────────────────────────────────────────────────────────────
 const BOARD_DARK  = '#769656';   // Tournament green
@@ -112,7 +113,17 @@ export default function ProductDemo() {
 
   // Sync game-over state after every FEN change
   useEffect(() => {
-    setGameOverReason(getGameOverReason(gameRef.current));
+    const reason = getGameOverReason(gameRef.current);
+    setGameOverReason(reason);
+
+    // Track game over when reason first appears
+    if (reason) {
+      trackEvent({
+        event: EVENTS.GAME_OVER,
+        reason,
+        move_count: gameRef.current.history().length,
+      });
+    }
   }, [gameFen]);
 
   // Progressive eval stabilization — update display eval at 1s, 2s, 3s, 4s, 5s after each change
@@ -216,8 +227,19 @@ export default function ProductDemo() {
         });
         if (move) {
           setGameFen(game.fen());
-          setShowHint(false); // dismiss hint on move
+          setShowHint(false);
           if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+
+          // Track human move
+          trackEvent({
+            event: EVENTS.MOVE_PLAYED,
+            from: sourceSquare,
+            to: targetSquare,
+            san: move.san,
+            move_number: game.history().length,
+            player: 'human',
+          });
+
           return true;
         }
       } catch {
@@ -233,6 +255,8 @@ export default function ProductDemo() {
     const game = gameRef.current;
     const history = game.history();
     if (history.length === 0) return;
+
+    const moveCountBefore = history.length;
     // Undo engine move + human move (2 half-moves), or just 1 if only 1 exists
     game.undo();
     if (game.history().length > 0 && game.turn() !== playerColor) {
@@ -241,12 +265,22 @@ export default function ProductDemo() {
     setGameFen(game.fen());
     setShowHint(false);
     stopSearch();
+
+    trackEvent({
+      event: EVENTS.MOVE_UNDONE,
+      move_count_before: moveCountBefore,
+    });
   }, [playerColor, stopSearch]);
 
   // Hint — ask engine for best move and highlight squares (no auto-play)
   const handleHint = useCallback(() => {
     setShowHint(true);
     analyzePosition(gameRef.current.fen());
+    trackEvent({
+      event: EVENTS.HINT_USED,
+      context: 'game',
+      page: window.location.pathname,
+    });
   }, [analyzePosition]);
 
   // Reset — load a fresh game into the ref without replacing the ref itself
@@ -271,11 +305,17 @@ export default function ProductDemo() {
   }, [stopSearch, resetEvaluation]);
 
   const handleReset = useCallback(() => {
+    const moveCount = gameRef.current.history().length;
     loadFreshGame();
+    trackEvent({
+      event: EVENTS.GAME_RESET,
+      move_count: moveCount,
+    });
   }, [loadFreshGame]);
 
   const handleChess960 = useCallback(() => {
     loadFreshGame(generateChess960FEN());
+    trackEvent({ event: EVENTS.CHESS960_STARTED });
   }, [loadFreshGame]);
 
   const handleOpenEditor = useCallback(() => {
@@ -283,6 +323,7 @@ export default function ProductDemo() {
     setShowHint(false);
     if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
     setIsEditMode(true);
+    trackEvent({ event: EVENTS.ENGINE_ANALYSIS_OPENED });
   }, [stopSearch]);
 
   const handleCancelEditor = useCallback(() => {
@@ -592,8 +633,17 @@ export default function ProductDemo() {
                       <button
                         key={level}
                         onClick={() => {
+                          const prevLevel = difficulty;
                           setDifficulty(level);
                           setShowHint(false);
+                          if (level !== prevLevel) {
+                            trackEvent({
+                              event: EVENTS.DIFFICULTY_SELECTED,
+                              level,
+                              label: DIFFICULTY_LABELS[level] ?? String(level),
+                              previous_level: prevLevel,
+                            });
+                          }
                         }}
                         title={`${DIFFICULTY_CONFIGS[level].name} (${DIFFICULTY_CONFIGS[level].rating})`}
                         className={`py-1 rounded text-xs font-mono transition-all duration-200 ${

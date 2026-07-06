@@ -10,6 +10,7 @@
 import { useState, useRef } from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { trackEvent, EVENTS, FORMS } from '../analytics';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -19,6 +20,9 @@ export default function ContactSection() {
   const [emailError, setEmailError] = useState('');
   const [messageError, setMessageError] = useState('');
   const [status, setStatus]         = useState<FormStatus>('idle');
+
+  // Analytics: track "form started" only once (first field interaction)
+  const formStartedRef = useRef(false);
 
   const ctaSectionRef = useRef<HTMLElement>(null);
 
@@ -49,6 +53,24 @@ export default function ContactSection() {
     const mErr = validateMessage(message);
     setEmailError(eErr);
     setMessageError(mErr);
+
+    // Track validation errors
+    if (eErr) {
+      trackEvent({
+        event: EVENTS.FORM_VALIDATION_ERROR,
+        form_name: FORMS.CONTACT,
+        field: 'email',
+        error_message: eErr,
+      });
+    }
+    if (mErr) {
+      trackEvent({
+        event: EVENTS.FORM_VALIDATION_ERROR,
+        form_name: FORMS.CONTACT,
+        field: 'message',
+        error_message: mErr,
+      });
+    }
     if (eErr || mErr) return;
 
     setStatus('submitting');
@@ -73,13 +95,30 @@ export default function ContactSection() {
 
       if (data.success) {
         setStatus('success');
+        trackEvent({
+          event: EVENTS.FORM_SUBMIT_SUCCESS,
+          form_name: FORMS.CONTACT,
+          page: window.location.pathname,
+        });
       } else {
         console.error('Web3Forms Error:', data);
         setStatus('error');
+        trackEvent({
+          event: EVENTS.FORM_SUBMIT_FAILURE,
+          form_name: FORMS.CONTACT,
+          page: window.location.pathname,
+          error: 'api_error',
+        });
       }
     } catch (err) {
       console.error('Submission failed:', err);
       setStatus('error');
+      trackEvent({
+        event: EVENTS.FORM_SUBMIT_FAILURE,
+        form_name: FORMS.CONTACT,
+        page: window.location.pathname,
+        error: 'network_error',
+      });
     }
   };
 
@@ -188,6 +227,22 @@ export default function ContactSection() {
                       setEmail(e.target.value);
                       if (emailError) setEmailError(validateEmail(e.target.value));
                     }}
+                    onFocus={() => {
+                      // Fire form_started on first field focus
+                      if (!formStartedRef.current) {
+                        formStartedRef.current = true;
+                        trackEvent({
+                          event: EVENTS.FORM_STARTED,
+                          form_name: FORMS.CONTACT,
+                          page: window.location.pathname,
+                        });
+                      }
+                      trackEvent({
+                        event: EVENTS.FORM_FIELD_FOCUS,
+                        form_name: FORMS.CONTACT,
+                        field_name: 'email',
+                      });
+                    }}
                     placeholder="you@example.com"
                     className={`contact-input font-sans ${emailError ? 'error' : ''}`}
                     aria-describedby={emailError ? 'email-error' : undefined}
@@ -209,6 +264,22 @@ export default function ContactSection() {
                     onChange={(e) => {
                       setMessage(e.target.value);
                       if (messageError) setMessageError(validateMessage(e.target.value));
+                    }}
+                    onFocus={() => {
+                      // Fire form_started on first field focus (if email wasn't focused first)
+                      if (!formStartedRef.current) {
+                        formStartedRef.current = true;
+                        trackEvent({
+                          event: EVENTS.FORM_STARTED,
+                          form_name: FORMS.CONTACT,
+                          page: window.location.pathname,
+                        });
+                      }
+                      trackEvent({
+                        event: EVENTS.FORM_FIELD_FOCUS,
+                        form_name: FORMS.CONTACT,
+                        field_name: 'message',
+                      });
                     }}
                     placeholder="Tell us about your vision, your audience, and how we can help."
                     className={`contact-textarea font-sans ${messageError ? 'error' : ''}`}

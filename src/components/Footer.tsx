@@ -6,6 +6,7 @@
 
 import { useRef } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { trackEvent, EVENTS } from '../analytics';
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -37,7 +38,11 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
           {/* Brand Signature */}
-          <div className="flex items-center space-x-3 select-none">
+          <div
+            className="flex items-center space-x-3 select-none cursor-pointer"
+            onClick={() => trackEvent({ event: EVENTS.LOGO_CLICK, location: 'footer' })}
+            role="presentation"
+          >
             <img
               src="/final%20logo.png"
               alt="XLChess logo"
@@ -75,7 +80,14 @@ export default function Footer() {
             >
               <a
                 href="#interactive-demo"
-                onClick={handlePlayClick}
+                onClick={(e) => {
+                  handlePlayClick(e);
+                  trackEvent({
+                    event: EVENTS.FOOTER_NAV_CLICK,
+                    link_name: 'play',
+                    destination: '#interactive-demo',
+                  });
+                }}
                 className="hover:text-ivory transition-colors duration-300"
                 style={{ letterSpacing: '0.06em' }}
               >
@@ -84,7 +96,14 @@ export default function Footer() {
               <span style={{ color: 'rgba(212, 175, 110, 0.2)' }} aria-hidden="true">·</span>
               <a
                 href="#hero-section"
-                onClick={handlePuzzlesClick}
+                onClick={(e) => {
+                  handlePuzzlesClick(e);
+                  trackEvent({
+                    event: EVENTS.FOOTER_NAV_CLICK,
+                    link_name: 'puzzles',
+                    destination: '#hero-section',
+                  });
+                }}
                 className="hover:text-ivory transition-colors duration-300"
                 style={{ letterSpacing: '0.06em' }}
               >

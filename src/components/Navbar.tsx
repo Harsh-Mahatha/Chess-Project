@@ -15,6 +15,7 @@ import { Menu, X } from "lucide-react";
 import { useNavbarAnimation } from "../hooks/useNavbarAnimation";
 import { useLogoAnimation } from "../hooks/useLogoAnimation";
 import { useButtonGlow } from "../hooks/useButtonGlow";
+import { trackEvent, EVENTS } from "../analytics";
 
 interface NavbarProps {
   onViewPuzzleClick?: () => void;
@@ -53,7 +54,10 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
             ref={containerRef}
             className="flex items-center gap-2 cursor-pointer select-none"
             style={{ perspective: "600px" }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            trackEvent({ event: EVENTS.LOGO_CLICK, location: 'navbar' });
+          }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -89,12 +93,22 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
                 href={link.href}
                 className="nav-link font-sans font-light text-sm tracking-wide text-brand-secondary hover:text-ivory transition-colors duration-300"
                 style={{ letterSpacing: "0.06em" }}
+                onClick={() =>
+                  trackEvent({
+                    event: EVENTS.NAVBAR_LINK_CLICK,
+                    link_name: link.name,
+                    destination: link.href,
+                  })
+                }
               >
                 {link.name}
               </a>
             ))}
             <button
-              onClick={onViewPuzzleClick}
+              onClick={() => {
+                onViewPuzzleClick?.();
+                trackEvent({ event: EVENTS.VIEW_PUZZLE_CLICK, location: 'navbar' });
+              }}
               className="nav-link font-sans text-sm font-light tracking-wide text-brand-secondary hover:text-ivory transition-colors duration-300 bg-transparent border-none p-0 cursor-pointer"
               style={{ letterSpacing: "0.06em" }}
             >
@@ -106,6 +120,14 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
               href="#partner-cta"
               id="navbar-cta-btn"
               className="btn-premium-cta btn-glow-container cta-shine px-5 py-2.5 rounded-sm text-sm"
+              onClick={() =>
+                trackEvent({
+                  event: EVENTS.NAVBAR_CTA_CLICK,
+                  button_name: 'become_a_partner',
+                  destination: '#partner-cta',
+                  location: 'desktop',
+                })
+              }
             >
               Become a Partner
             </a>
@@ -114,7 +136,11 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
           {/* Mobile Menu Toggle */}
           <div className="md:hidden">
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => {
+                const next = !isOpen;
+                setIsOpen(next);
+                trackEvent({ event: next ? EVENTS.MOBILE_MENU_OPEN : EVENTS.MOBILE_MENU_CLOSE });
+              }}
               className="text-brand-secondary hover:text-ivory p-2 transition-colors"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
@@ -146,7 +172,14 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  trackEvent({
+                    event: EVENTS.NAVBAR_LINK_CLICK,
+                    link_name: link.name,
+                    destination: link.href,
+                  });
+                }}
                 className="font-sans font-light text-base text-brand-secondary hover:text-ivory transition-colors py-1"
                 style={{ letterSpacing: "0.04em" }}
               >
@@ -157,6 +190,7 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
               onClick={() => {
                 setIsOpen(false);
                 onViewPuzzleClick?.();
+                trackEvent({ event: EVENTS.VIEW_PUZZLE_CLICK, location: 'mobile_menu' });
               }}
               className="font-sans font-light text-base text-brand-secondary hover:text-ivory transition-colors py-1 text-left bg-transparent border-none p-0 cursor-pointer"
               style={{ letterSpacing: "0.04em" }}
@@ -166,7 +200,15 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
             <div className="section-divider my-1" />
             <a
               href="#partner-cta"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                trackEvent({
+                  event: EVENTS.NAVBAR_CTA_CLICK,
+                  button_name: 'become_a_partner',
+                  destination: '#partner-cta',
+                  location: 'mobile',
+                });
+              }}
               className="btn-premium-cta cta-shine text-center py-3 px-4 rounded-sm block"
             >
               Become a Partner
