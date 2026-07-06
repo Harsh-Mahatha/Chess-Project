@@ -42,6 +42,9 @@ export default function Footer() {
               src="/final%20logo.png"
               alt="XLChess logo"
               className="h-[64px] sm:h-[76px] w-auto object-contain"
+              loading="lazy"
+              width={200}
+              height={76}
               style={{ display: 'block', opacity: 0.9 }}
               draggable={false}
             />
@@ -65,28 +68,30 @@ export default function Footer() {
           </p>
 
           {/* Navigation */}
-          <div
-            className="flex items-center space-x-4 font-sans text-xs"
-            style={{ color: 'var(--text-tertiary)' }}
-          >
-            <a
-              href="#interactive-demo"
-              onClick={handlePlayClick}
-              className="hover:text-ivory transition-colors duration-300"
-              style={{ letterSpacing: '0.06em' }}
+          <nav aria-label="Footer navigation">
+            <div
+              className="flex items-center space-x-4 font-sans text-xs"
+              style={{ color: 'var(--text-tertiary)' }}
             >
-              Play
-            </a>
-            <span style={{ color: 'rgba(212, 175, 110, 0.2)' }}>·</span>
-            <a
-              href="#hero-section"
-              onClick={handlePuzzlesClick}
-              className="hover:text-ivory transition-colors duration-300"
-              style={{ letterSpacing: '0.06em' }}
-            >
-              Puzzles
-            </a>
-          </div>
+              <a
+                href="#interactive-demo"
+                onClick={handlePlayClick}
+                className="hover:text-ivory transition-colors duration-300"
+                style={{ letterSpacing: '0.06em' }}
+              >
+                Play
+              </a>
+              <span style={{ color: 'rgba(212, 175, 110, 0.2)' }} aria-hidden="true">·</span>
+              <a
+                href="#hero-section"
+                onClick={handlePuzzlesClick}
+                className="hover:text-ivory transition-colors duration-300"
+                style={{ letterSpacing: '0.06em' }}
+              >
+                Puzzles
+              </a>
+            </div>
+          </nav>
 
         </div>
       </div>

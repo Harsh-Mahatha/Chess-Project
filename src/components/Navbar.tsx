@@ -54,7 +54,14 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
             className="flex items-center gap-2 cursor-pointer select-none"
             style={{ perspective: "600px" }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
             role="link"
+            tabIndex={0}
             aria-label="XLChess — scroll to top"
           >
             <img
@@ -62,6 +69,9 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
               src="/final%20logo.png"
               alt="XLChess logo"
               className="h-[40px] sm:h-[52px] w-auto object-contain"
+              width={200}
+              height={52}
+              fetchPriority="high"
               style={{
                 willChange: "transform, filter",
                 transformStyle: "preserve-3d",
@@ -108,6 +118,7 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
               className="text-brand-secondary hover:text-ivory p-2 transition-colors"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
+              aria-controls="mobile-nav-menu"
             >
               {isOpen ? (
                 <X className="w-5 h-5" />
@@ -122,6 +133,7 @@ export default function Navbar({ onViewPuzzleClick }: NavbarProps) {
       {/* Mobile Dropdown */}
       {isOpen && (
         <div
+          id="mobile-nav-menu"
           className="md:hidden border-b px-4 py-6 space-y-4"
           style={{
             background: "rgba(8, 11, 20, 0.97)",

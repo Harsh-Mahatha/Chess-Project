@@ -342,6 +342,9 @@ export default function Hero() {
                   src="/final%20logo.png"
                   alt="XLChess logo"
                   className="object-contain"
+                  width={400}
+                  height={150}
+                  fetchPriority="high"
                   style={{
                     height: '150px',
                     width: 'auto',

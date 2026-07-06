@@ -125,12 +125,12 @@ export default function ContactSection() {
             </div>
 
             {/* Heading */}
-            <h1
+            <h2
               id="contact-heading"
               className="contact-h2 font-display font-semibold"
             >
               Let's Build Together
-            </h1>
+            </h2>
 
             {/* Success state */}
             {status === 'success' ? (

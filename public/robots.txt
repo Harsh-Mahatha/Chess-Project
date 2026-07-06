@@ -1,0 +1,16 @@
+# XLChess robots.txt
+# https://xlchess.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Block internal source/build artifacts if ever exposed
+Disallow: /src/
+Disallow: /.git/
+
+# Block utility/processing scripts in the public folder
+Disallow: /generate_svg.py
+Disallow: /process_favicon.py
+
+# Sitemaps
+Sitemap: https://xlchess-harsh-mahatha.vercel.app/sitemap.xml

@@ -279,6 +279,7 @@ export default function BrandSection() {
                     src="/final%20banner.png"
                     alt="Build More Than Subscribers — XLChess platform artwork"
                     className="w-full h-auto object-contain block relative z-10"
+                    loading="lazy"
                     draggable={false}
                   />
                 </div>
