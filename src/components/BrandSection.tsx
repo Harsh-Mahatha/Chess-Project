@@ -7,10 +7,11 @@
  * No business logic changed.
  */
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useGSAP } from "../hooks/useGSAP";
 import { gsap, dur, ScrollTrigger } from "../utils/gsapConfig";
 import { ArrowRight } from "lucide-react";
+import { trackEvent, EVENTS } from "../analytics";
 
 export default function BrandSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -21,6 +22,27 @@ export default function BrandSection() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
+
+  // Analytics: fire section_viewed once when section enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          trackEvent({
+            event: EVENTS.SECTION_VIEWED,
+            section_id: 'brand-section',
+            section_name: 'Architecture of Independence',
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useGSAP(
     () => {
@@ -279,6 +301,7 @@ export default function BrandSection() {
                     src="/final%20banner.png"
                     alt="Build More Than Subscribers — XLChess platform artwork"
                     className="w-full h-auto object-contain block relative z-10"
+                    loading="lazy"
                     draggable={false}
                   />
                 </div>

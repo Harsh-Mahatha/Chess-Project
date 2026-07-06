@@ -46,6 +46,7 @@ import { prefersReducedMotion } from '../utils/gsapConfig';
 import { useMoveAnnotation } from '../hooks/useMoveAnnotation';
 import { MoveAnnotation } from './MoveAnnotation';
 import ChessAnimationLayer from './ChessAnimationLayer';
+import { trackEvent, EVENTS, PUZZLES } from '../analytics';
 
 interface ActiveMove {
   startX: number;
@@ -1029,6 +1030,12 @@ export default function HeroPuzzle() {
     setCurrentMoveIndex(40);
     setPuzzleStep(0);
     setShowTryAgain(false);
+
+    // Analytics: puzzle has started — user is now interactive
+    trackEvent({
+      event: EVENTS.PUZZLE_STARTED,
+      puzzle_id: PUZZLES.HERO_PUZZLE,
+    });
   }, [playStep]);
 
   // Launch autoplay on initial mount
@@ -1084,6 +1091,19 @@ export default function HeroPuzzle() {
       // Set success phase immediately so board highlights kick in (0.05s)
       setPhase('SUCCESS');
       setIsCheckmateGlow(true);
+
+      // Analytics: puzzle completed + checkmate
+      trackEvent({
+        event: EVENTS.PUZZLE_COMPLETED,
+        puzzle_id: PUZZLES.HERO_PUZZLE,
+        time_taken_seconds: 0, // autoplay sequence — no timer
+        moves_used: puzzleStep + 1,
+      });
+      trackEvent({
+        event: EVENTS.CHECKMATE,
+        context: 'puzzle',
+        winner: 'white',
+      });
 
       // Animate checkmate badges after DOM render
       setTimeout(() => {
@@ -1255,6 +1275,12 @@ export default function HeroPuzzle() {
       animResolveRef.current();
       animResolveRef.current = null;
     }
+
+    // Analytics: puzzle restarted
+    trackEvent({
+      event: EVENTS.PUZZLE_RESTARTED,
+      puzzle_id: PUZZLES.HERO_PUZZLE,
+    });
 
     // Reset checkmate overlay badge display immediately
     if (checkmateRef.current) {

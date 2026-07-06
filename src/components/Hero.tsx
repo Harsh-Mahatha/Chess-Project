@@ -31,6 +31,7 @@ import { useButtonGlow } from '../hooks/useButtonGlow';
 import { gsap, dur, ease } from '../utils/gsapConfig';
 import HeroPuzzle from './HeroPuzzle';
 import Navbar from './Navbar';
+import { trackEvent, EVENTS } from '../analytics';
 
 export default function Hero() {
   // ── Animation refs ────────────────────────────────────────────────────────
@@ -342,6 +343,9 @@ export default function Hero() {
                   src="/final%20logo.png"
                   alt="XLChess logo"
                   className="object-contain"
+                  width={400}
+                  height={150}
+                  fetchPriority="high"
                   style={{
                     height: '150px',
                     width: 'auto',
@@ -443,6 +447,13 @@ export default function Hero() {
                     height: '60px',
                     padding: '0 10px',
                   }}
+                  onClick={() =>
+                    trackEvent({
+                      event: EVENTS.HERO_CTA_CLICK,
+                      button_name: 'play',
+                      destination: '#interactive-demo',
+                    })
+                  }
                 >
                   <img
                     ref={playIconRef}
@@ -480,6 +491,13 @@ export default function Hero() {
                   href="#partner-cta"
                   className="nav-link font-sans text-sm font-light text-brand-secondary hover:text-ivory transition-colors duration-300 sm:pl-2"
                   style={{ letterSpacing: '0.04em' }}
+                  onClick={() =>
+                    trackEvent({
+                      event: EVENTS.HERO_SECONDARY_CTA_CLICK,
+                      button_name: 'partner_with_us',
+                      destination: '#partner-cta',
+                    })
+                  }
                 >
                   Partner with us →
                 </a>

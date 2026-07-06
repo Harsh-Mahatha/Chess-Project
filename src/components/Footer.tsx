@@ -6,6 +6,7 @@
 
 import { useRef } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { trackEvent, EVENTS } from '../analytics';
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -37,11 +38,18 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
           {/* Brand Signature */}
-          <div className="flex items-center space-x-3 select-none">
+          <div
+            className="flex items-center space-x-3 select-none cursor-pointer"
+            onClick={() => trackEvent({ event: EVENTS.LOGO_CLICK, location: 'footer' })}
+            role="presentation"
+          >
             <img
               src="/final%20logo.png"
               alt="XLChess logo"
               className="h-[64px] sm:h-[76px] w-auto object-contain"
+              loading="lazy"
+              width={200}
+              height={76}
               style={{ display: 'block', opacity: 0.9 }}
               draggable={false}
             />
@@ -65,28 +73,44 @@ export default function Footer() {
           </p>
 
           {/* Navigation */}
-          <div
-            className="flex items-center space-x-4 font-sans text-xs"
-            style={{ color: 'var(--text-tertiary)' }}
-          >
-            <a
-              href="#interactive-demo"
-              onClick={handlePlayClick}
-              className="hover:text-ivory transition-colors duration-300"
-              style={{ letterSpacing: '0.06em' }}
+          <nav aria-label="Footer navigation">
+            <div
+              className="flex items-center space-x-4 font-sans text-xs"
+              style={{ color: 'var(--text-tertiary)' }}
             >
-              Play
-            </a>
-            <span style={{ color: 'rgba(212, 175, 110, 0.2)' }}>·</span>
-            <a
-              href="#hero-section"
-              onClick={handlePuzzlesClick}
-              className="hover:text-ivory transition-colors duration-300"
-              style={{ letterSpacing: '0.06em' }}
-            >
-              Puzzles
-            </a>
-          </div>
+              <a
+                href="#interactive-demo"
+                onClick={(e) => {
+                  handlePlayClick(e);
+                  trackEvent({
+                    event: EVENTS.FOOTER_NAV_CLICK,
+                    link_name: 'play',
+                    destination: '#interactive-demo',
+                  });
+                }}
+                className="hover:text-ivory transition-colors duration-300"
+                style={{ letterSpacing: '0.06em' }}
+              >
+                Play
+              </a>
+              <span style={{ color: 'rgba(212, 175, 110, 0.2)' }} aria-hidden="true">·</span>
+              <a
+                href="#hero-section"
+                onClick={(e) => {
+                  handlePuzzlesClick(e);
+                  trackEvent({
+                    event: EVENTS.FOOTER_NAV_CLICK,
+                    link_name: 'puzzles',
+                    destination: '#hero-section',
+                  });
+                }}
+                className="hover:text-ivory transition-colors duration-300"
+                style={{ letterSpacing: '0.06em' }}
+              >
+                Puzzles
+              </a>
+            </div>
+          </nav>
 
         </div>
       </div>

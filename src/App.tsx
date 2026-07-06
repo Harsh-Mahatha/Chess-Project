@@ -16,6 +16,9 @@ import './utils/gsapConfig';
 
 import { useState } from 'react';
 
+// ── Analytics: global session + scroll tracking ──────────────────────────
+import { useAnalytics, useScrollDepth } from './analytics';
+
 import Hero from './components/Hero';
 import BrandSection from './components/BrandSection';
 import Features from './components/Features';
@@ -37,6 +40,12 @@ const initParticles = async (engine: any) => {
 
 function App() {
   const [loaderDone, setLoaderDone] = useState(false);
+
+  // ── Analytics: session lifecycle + page view + first interaction ───────
+  useAnalytics();
+
+  // ── Analytics: scroll depth milestones (25/50/75/100%) ─────────────────
+  useScrollDepth();
 
   return (
     <ParticlesProvider init={initParticles}>

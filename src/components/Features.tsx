@@ -18,6 +18,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { Users, ShieldCheck, GraduationCap } from 'lucide-react';
 import { useGSAP } from '../hooks/useGSAP';
 import { gsap, dur } from '../utils/gsapConfig';
+import { trackEvent, EVENTS } from '../analytics';
 
 // ── Individual premium card with perspective tilt ────────────────────────────
 
@@ -129,6 +130,28 @@ export default function Features() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef  = useRef<HTMLDivElement>(null);
   const gridRef    = useRef<HTMLDivElement>(null);
+
+  // Analytics: fire section_viewed when the section enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          trackEvent({
+            event: EVENTS.SECTION_VIEWED,
+            section_id: 'why-ownership',
+            section_name: 'Three Pillars of Ownership',
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Header reveal (upgraded to use inline GSAP below)
   useGSAP(

@@ -13,16 +13,38 @@
  * Copy upgrade: sharper, more confident editorial tone
  */
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Palette, Cpu, Rocket } from 'lucide-react';
 import { useGSAP } from '../hooks/useGSAP';
 import { gsap, dur, ScrollTrigger } from '../utils/gsapConfig';
+import { trackEvent, EVENTS } from '../analytics';
 
 export default function HowItWorks() {
   const sectionRef  = useRef<HTMLElement>(null);
   const headerRef   = useRef<HTMLDivElement>(null);
   const stepsRef    = useRef<HTMLDivElement>(null);
   const lineRef     = useRef<HTMLDivElement>(null);
+
+  // Analytics: fire section_viewed once when section enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          trackEvent({
+            event: EVENTS.SECTION_VIEWED,
+            section_id: 'how-it-works',
+            section_name: 'Three Moves',
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useGSAP(
     () => {
